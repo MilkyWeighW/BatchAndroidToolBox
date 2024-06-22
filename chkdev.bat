@@ -11,7 +11,7 @@
 @ECHO OFF
 set var1=%1& set var2=%2& set var3=%3& set var4=%4& set var5=%5& set var6=%6& set var7=%7& set var8=%8& set var9=%9
 goto %var1%
-
+set "wait=ping 127.0.0.1 -n 3 >nul"
 
 :SYSTEM
 ::接收参数
@@ -29,8 +29,7 @@ for /f %%a in ('adb.exe devices -l ^| find /v "List of devices attached" ^| find
 for /f "tokens=2 delims= " %%i in ('adb.exe devices -l ^| find /v "List of devices attached"') do (if not "%%i"=="device" TIMEOUT /T 1 /NOBREAK>nul & goto SYSTEM-2)
 ::目标设备已经检测到
 if "%rechk%"=="y" set rechk=n& ECHO.%rechk_wait%秒后将再次检查, 请稍候... & TIMEOUT /T %rechk_wait% /NOBREAK>nul & goto SYSTEM-1
-ECHO.设备已连接(系统)
-pause
+ECHO.设备已连接(系统),3秒后继续 & %wait% 
 exit /b 
 
 
@@ -50,7 +49,7 @@ for /f %%a in ('adb.exe devices -l ^| find /v "List of devices attached" ^| find
 for /f "tokens=2 delims= " %%i in ('adb.exe devices -l ^| find /v "List of devices attached"') do (if not "%%i"=="recovery" TIMEOUT /T 1 /NOBREAK>nul & goto RECOVERY-2)
 ::目标设备已经检测到
 if "%rechk%"=="y" set rechk=n& ECHO.%rechk_wait%秒后将再次检查, 请稍候... & TIMEOUT /T %rechk_wait% /NOBREAK>nul & goto RECOVERY-1
-ECHO.设备已连接(Recovery)
+ECHO.设备已连接(Recovery),3秒后继续 & %wait%
 exit /b 
 
 :SIDELOAD
@@ -69,7 +68,7 @@ for /f %%a in ('adb.exe devices -l ^| find /v "List of devices attached" ^| find
 for /f "tokens=2 delims= " %%i in ('adb.exe devices -l ^| find /v "List of devices attached"') do (if not "%%i"=="sideload" TIMEOUT /T 1 /NOBREAK>nul & goto SIDELOAD-2)
 ::目标设备已经检测到
 if "%rechk%"=="y" set rechk=n& ECHO.%rechk_wait%秒后将再次检查, 请稍候... & TIMEOUT /T %rechk_wait% /NOBREAK>nul & goto SIDELOAD-1
-ECHO.设备已连接(Sideload)
+ECHO.设备已连接(Sideload),3秒后继续 & %wait%
 exit /b 
 
 :FASTBOOT
@@ -88,7 +87,7 @@ for /f %%a in ('fastboot.exe devices ^| find /c "	"') do (if %%a LSS 1 TIMEOUT /
 for /f "tokens=2 delims= " %%i in ('fastboot.exe devices ^| find "	"') do (if not "%%i"=="fastboot" TIMEOUT /T 1 /NOBREAK>nul & goto FASTBOOT-2)
 ::目标设备已经检测到
 if "%rechk%"=="y" set rechk=n& ECHO.%rechk_wait%秒后将再次检查, 请稍候... & TIMEOUT /T %rechk_wait% /NOBREAK>nul & goto FASTBOOT-1
-ECHO.设备已连接(Fastboot)
+ECHO.设备已连接(Fastboot),3秒后继续 & %wait%
 exit /b 
 
 :FASTBOOTD
@@ -107,7 +106,7 @@ for /f %%a in ('fastboot.exe devices ^| find /c "	"') do (if %%a LSS 1 TIMEOUT /
 for /f "tokens=2 delims= " %%i in ('fastboot.exe devices ^| find "	"') do (if not "%%i"=="fastboot" TIMEOUT /T 1 /NOBREAK>nul & goto FASTBOOTD-2)
 ::目标设备已经检测到
 if "%rechk%"=="y" set rechk=n& ECHO.%rechk_wait%秒后将再次检查, 请稍候... & TIMEOUT /T %rechk_wait% /NOBREAK>nul & goto FASTBOOTD-1
-ECHO.设备已连接(Fastbootd) 
+ECHO.设备已连接(Fastbootd),3秒后继续 & %wait%
 exit /b 
 
 

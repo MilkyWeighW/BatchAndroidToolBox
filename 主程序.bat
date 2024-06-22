@@ -1,7 +1,7 @@
 @echo off
 chcp 936
 cd /d %~dp0
-title 欢迎使用Android小工具.
+title 欢迎使用Android小工具V2.
 set unicode=【请输入正确的字符,等待5秒并滚回主菜单】
 set "wait=ping 127.0.0.1 -n 5 >nul"
 set MENU=goto menu
@@ -14,9 +14,8 @@ cls
 :MENU
 %deltemp%
 cls
-color b
-echo 请先执行完【安装.bat】再运行本程序.
-echo 配合【安装.bat】及搜索引擎效果更佳.
+color 3
+echo 配合【辅助.bat】及搜索引擎效果更佳.
 echo 如果遇到没有【返回主菜单】选项的话,输入一个错误的值即可.
 echo 请只连接一个设备,包含模拟器!
 %partcode%
@@ -98,7 +97,7 @@ for /f "tokens=2 delims= " %%i in (target.txt) do (
 	%partcode%
 	setlocal enabledelayedexpansion
 	echo 存储于%%i 路径下，正在提取...
-	adb shell " su -c 'dd if=%%i of=/sdcard/%partition%.img'" || echo 分区提取失败！ & goto err
+	adb shell " su -c 'dd if=%%i of=/sdcard/%partition%.img'" || echo 分区提取失败！ & %err%
 	adb pull /sdcard/%partition%.img %~dp0\output
 	endlocal
 	%partcode%
@@ -166,7 +165,7 @@ goto others
 echo 该程序通过删除/data/system/locksetting.db来实现.
 echo 按下任意键来执行.
 pause >nul
-adb shell " su -c 'rm /data/system/locksetting.db'" || echo 分区提取失败！ & goto err
+adb shell " su -c 'rm /data/system/locksetting.db'" || echo 删除密码失败！ & %err%
 echo 操作成功完成!按任意键返回上级菜单
 pause >nul
 goto others
