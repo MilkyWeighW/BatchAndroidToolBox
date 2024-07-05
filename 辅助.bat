@@ -1,50 +1,38 @@
 @echo off
 color a
 cd /d %~dp0
-set unicode=ã€è¯·è¾“å…¥æ­£ç¡®çš„å­—ç¬¦,ç­‰å¾…5ç§’å¹¶æ»šå›žä¸»èœå•ã€‘
+set unicode=¡¾ÇëÊäÈëÕýÈ·µÄ×Ö·û,µÈ´ý5Ãë²¢¹ö»ØÖ÷²Ëµ¥¡¿
 set "wait=ping 127.0.0.1 -n 3 >nul"
 set MENU=goto main
 
 :main
-title æ¬¢è¿Žä½¿ç”¨Androidå°å·¥å…·çš„è¾…åŠ©.
-
-echo é€‰æ‹©ä¸€é¡¹åŠŸèƒ½ä»¥è¾…ä½ä¸»ç¨‹åºè¿è¡Œ:
-
-echo ã€1ã€‘æ£€æŸ¥adbè®¾å¤‡è¿žæŽ¥çŠ¶æ€.
-
-echo ã€2ã€‘æ£€æŸ¥fastbootè®¾å¤‡è¿žæŽ¥çŠ¶æ€.
-
-echo ã€3ã€‘æŸ¥çœ‹adbå’Œfastbootç‰ˆæœ¬å·.
-
-echo ã€4ã€‘æ‰“å¼€ä¸€ä¸ªç©ºå‘½ä»¤æç¤ºç¬¦.
-
-echo ã€5ã€‘fastboot --^> ç³»ç»Ÿ
-
-echo ã€6ã€‘ç³»ç»Ÿ --^> Recovery
-
-echo ã€7ã€‘ç³»ç»Ÿ --^> fastboot
-
-echo ã€8ã€‘fastboot --^> edlã€é«˜é€šã€‘
-
-echo ã€9ã€‘ç›‘æµ‹å½“å‰åº”ç”¨
-
-echo ã€aã€‘å®‰è£…é©±åŠ¨
-
-echo ã€bã€‘ä¿®å¤usb3å¯¼è‡´çš„å„ç§é—®é¢˜
+title »¶Ó­Ê¹ÓÃAndroidÐ¡¹¤¾ßµÄ¸¨Öú.
+echo Ñ¡ÔñÒ»Ïî¹¦ÄÜÒÔ¸¨×ôÖ÷³ÌÐòÔËÐÐ:
+echo ¡¾1¡¿´òÓ¡µ±Ç°Á¬½ÓµÄadbÉè±¸.
+echo ¡¾2¡¿´òÓ¡µ±Ç°Á¬½ÓµÄfastbootÉè±¸.
+echo ¡¾3¡¿²é¿´adbºÍfastboot°æ±¾ºÅ.
+echo ¡¾4¡¿´ò¿ªÒ»¸ö¿ÕÃüÁîÌáÊ¾·û.
+echo ¡¾5¡¿fastboot --^> ÏµÍ³
+echo ¡¾6¡¿ÏµÍ³ --^> Recovery
+echo ¡¾7¡¿ÏµÍ³ --^> bootloader
+echo ¡¾8¡¿fastboot --^> edl¡¾¸ßÍ¨¡¿
+echo ¡¾9¡¿¼à²âµ±Ç°Ó¦ÓÃ
+echo ¡¾a¡¿°²×°Çý¶¯
+echo ¡¾b¡¿ÐÞ¸´usb3µ¼ÖÂµÄ¸÷ÖÖÎÊÌâ
 
 set choice=
-set /p choice=è¯·è¾“å…¥å¯¹åº”æ•°å­—å›žè½¦ï¼š
+set /p choice=ÇëÊäÈë¶ÔÓ¦Êý×Ö»Ø³µ£º
 if not "%choice%"=="" set choice=%choice:~0,1%
 if /i "%choice%"=="1" goto chkadb
 if /i "%choice%"=="2" goto chkfb
-if /i "%choice%"=="5" fastboot reboot & echo æ­£åœ¨é‡å¯... & goto finish || goto err
+if /i "%choice%"=="5" fastboot reboot & echo ÕýÔÚÖØÆô... & goto finish || goto err
 if /i "%choice%"=="3" goto version
 if /i "%choice%"=="4" goto cmd
-if /i "%choice%"=="7" adb reboot recovery & echo æ­£åœ¨é‡å¯... & goto finish || goto err
-if /i "%choice%"=="7" adb reboot fastboot & echo æ­£åœ¨é‡å¯... & goto finish || goto err
-if /i "%choice%"=="8" fastboot reboot edl & echo æ­£åœ¨é‡å¯... & goto finish || goto err
+if /i "%choice%"=="7" adb reboot recovery & echo ÕýÔÚÖØÆô... & goto finish || goto err
+if /i "%choice%"=="7" adb reboot bootloader & echo ÕýÔÚÖØÆô... & goto finish || goto err
+if /i "%choice%"=="8" fastboot reboot edl & echo ÕýÔÚÖØÆô... & goto finish || goto err
 if /i "%choice%"=="9" goto listen0
-if /i "%choice%"=="a" start %~dp0\driver.exe & echo å·²æ‰“å¼€é©±åŠ¨å®‰è£…ç¨‹åº! & pause >nul
+if /i "%choice%"=="a" start %~dp0\driver.exe & echo ÒÑ´ò¿ªÇý¶¯°²×°³ÌÐò! & pause >nul
 if /i "%choice%"=="b" call %~dp0\usb3Fix.bat
 ECHO.
 ECHO. %unicode%
@@ -52,11 +40,9 @@ ECHO. %unicode%
 ECHO.
 %MENU%
 
-rem *********************è¿™æ˜¯ä¸€ä¸ªä»£ç å—**************************
-
-
+::¼ì²éadbÉè±¸Á¬½Ó
 :chkadb
-echo å°†ä¼šæ¯éš”äº”ç§’æ£€æŸ¥å¹¶æ‰“å°è®¾å¤‡åˆ—è¡¨.
+echo ½«»áÃ¿¸ôÎåÃë¼ì²é²¢´òÓ¡Éè±¸ÁÐ±í.
 ping -n 5 127.0.0.1>nul
 echo *************
 echo %date%,%time%
@@ -65,17 +51,16 @@ for /f "tokens=1" %%a in ('adb devices^|findstr /r /c:"device$"') do (
     set device_name=%%a
     goto adb_connect_device
 )
-echo å½“å‰æœªå‘çŽ°adbå·²è¿žæŽ¥çš„ Android è®¾å¤‡ã€‚
+echo µ±Ç°Î´·¢ÏÖadbÒÑÁ¬½ÓµÄ Android Éè±¸¡£
 goto chkadb
 
 :adb_connect_device
-echo å·²è¿žæŽ¥çš„è®¾å¤‡åç§°ï¼š%device_name%
+echo ÒÑÁ¬½ÓµÄÉè±¸Ãû³Æ£º%device_name%
 goto chkadb
 
-rem *********************è¿™æ˜¯ä¸€ä¸ªä»£ç å—**************************
-
+::¼ì²ébootloaderÉè±¸Á¬½Ó
 :chkfb
-echo å°†ä¼šæ¯éš”äº”ç§’æ£€æŸ¥å¹¶æ‰“å°è®¾å¤‡åˆ—è¡¨.
+echo ½«»áÃ¿¸ôÎåÃë¼ì²é²¢´òÓ¡Éè±¸ÁÐ±í.
 ping -n 5 127.0.0.1>nul
 echo *************
 echo %date%,%time%
@@ -84,39 +69,38 @@ for /f "tokens=1" %%a in ('fastboot devices^|findstr /r /c:"device$"') do (
     set device_name=%%a
     goto fb_connect_device
 )
-echo å½“å‰æœªå‘çŽ°å·²è¿žæŽ¥çš„ Android è®¾å¤‡ã€‚
+echo µ±Ç°Î´·¢ÏÖÒÑÁ¬½ÓµÄ Android Éè±¸¡£
 goto chkfb
 
 :fb_connect_device
-echo å·²è¿žæŽ¥çš„è®¾å¤‡åç§°ï¼š%device_name%
+echo ÒÑÁ¬½ÓµÄÉè±¸Ãû³Æ£º%device_name%
 goto chkfb
 
-rem *********************è¿™æ˜¯ä¸€ä¸ªä»£ç å—**************************
 
 :recc
-fastboot reboot Recovery || echo é‡å¯æ—¶å‡ºé”™! && goto err
+fastboot reboot Recovery || echo ÖØÆôÊ±³ö´í! && goto err
 goto finish
 pause
 
 :version
-echo adbç‰ˆæœ¬:
+echo adb°æ±¾:
 adb version
-echo fastbootç‰ˆæœ¬ä¸Žè¯¥adbé…å¥—
+echo fastboot°æ±¾Óë¸ÃadbÅäÌ×
 pause
 goto finish
 
 :finish
-echo å®Œæˆ.æŒ‰ä»»æ„é”®è¿”å›žä¸Šçº§èœå•.
+echo Íê³É.°´ÈÎÒâ¼ü·µ»ØÉÏ¼¶²Ëµ¥.
 pause >nul
 goto end_pre
 
 :cmd
-start cmd /k echo å®Œæˆ!
+start cmd /k echo Íê³É!
 goto end_pre
 
 :listen0
 cls
-echo å°†ä¼šæ¯éš”ä¸‰ç§’æ£€æŸ¥å¹¶æ‰“å°å½“å‰åº”ç”¨
+echo ½«»áÃ¿¸ôÈýÃë¼ì²é²¢´òÓ¡µ±Ç°Ó¦ÓÃ
 goto listen
 
 :listen
@@ -129,8 +113,8 @@ for /f "tokens=3 delims= " %%a in ('adb shell dumpsys window ^| findstr mCurrent
 for /f "tokens=1 delims=/" %%b in ("%packageName%") do (
     set "packageName=%%b"
 )
-if %packageName%==NotificationShade} (echo å½“å‰æ­£åœ¨é”å±çŠ¶æ€! && endlocal && goto listen)
-if %packageName%== (echo çŽ°åœ¨æ­£åœ¨åˆ‡æ¢åº”ç”¨ && endlocal && goto listen)
+if %packageName%==NotificationShade} (echo µ±Ç°ÕýÔÚËøÆÁ×´Ì¬! && endlocal && goto listen)
+if %packageName%== (echo ÏÖÔÚÕýÔÚÇÐ»»Ó¦ÓÃ && endlocal && goto listen)
 echo %packageName%
 endlocal
 goto listen
@@ -138,8 +122,8 @@ goto listen
 :err
 color c
 echo ***********************************************
-echo å‘ç”Ÿé”™è¯¯.
-echo å¯ä»¥ç”¨ä¸Šæ–¹çš„é”™è¯¯æç¤ºç»“åˆæœç´¢å¼•æ“ŽæŸ¥æ‰¾å¹¶è§£å†³é”™è¯¯.
-echo æŒ‰ä»»æ„é”®è¿”å›žä¸»èœå•.
+echo ·¢Éú´íÎó.
+echo ¿ÉÒÔÓÃÉÏ·½µÄ´íÎóÌáÊ¾½áºÏËÑË÷ÒýÇæ²éÕÒ²¢½â¾ö´íÎó.
+echo °´ÈÎÒâ¼ü·µ»ØÖ÷²Ëµ¥.
 pause >nul
 %menu%

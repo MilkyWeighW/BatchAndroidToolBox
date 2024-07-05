@@ -27,7 +27,8 @@ echo 【4】杂项功能.
 echo 【5】手机信息查看.
 echo 【6】应用安装.
 echo 【7】线刷（打开空命令行）.
-echo 【8】重启adb服务
+echo 【8】重启adb服务.
+echo 【9】关于.
 %partcode%
 set choice= 
 set /p choice=请输入对应数字回车：
@@ -40,6 +41,7 @@ if "%choice%"=="5" goto info
 if "%choice%"=="6" goto installapp
 if "%choice%"=="7" goto batFlash
 if "%choice%"=="8" adb kill-server & adb start-server & echo 重启完毕! & %wait% & %menu%
+if "%choice%"=="9" goto credit
 %choice_end%
 
 ::应用安装
@@ -135,14 +137,14 @@ exit
 :others
 echo 选择一个功能以继续.
 echo 【1】bootloader解锁 【2】删除手机锁屏密码（需root） 【3】打开adbshell 
-echo 【4】网络验证服务器更改
+echo 【4】网络验证服务器更改【维护中】
 set choice=
 set /p choice=请输入对应数字回车：
 if not "%choice%"=="" set choice=%choice:~0,1%
 if "%choice%"=="1" goto bl_unlock
 if "%choice%"=="2" goto crack
 if "%choice%"=="3" goto adb_shell
-if "%choice%"=="4" goto sync_Edit
+if "%choice%"=="4" %menu%
 %choice_end%
 
 :bl_unlock
@@ -172,25 +174,7 @@ goto others
 
 :adb_shell
 echo 正在打开adbShell...
-adb shell || echo 出错! & %err%
-
-:sync_Edit
-echo 在开始之前，需要删除原有的配置，继续(Y/N)？
-set choice=
-set /p choice=键入单个首字母【Y/N】并回车以继续:
-if "%choice%"=="Y" adb shell settings delete global captive_portal_https_url & adb shell settings delete global captive_portal_https_url & goto sync_Edit_1
-if "%choice%"=="N" goto others
-%choice_end%
-
-:sync_Edit_1
-echo 选择你想更改成哪个服务器:
-echo 【1】 Miui 服务器 【2】 Google 服务器
-set choice=
-set /p choice=请输入对应数字回车：
-if not "%choice%"=="" set choice=%choice:~0,1%
-if "%choice%"=="1" adb shell settings put global captive_portal_https_url https://connect.rom.miui.com/generated_204 && adb shell settings put global captive_portal_http_url http://connect.rom.miui.com/generated_204
-if "%choice%"=="2" adb shell settings put global captive_portal_https_url https://g.cn/generated_204 && adb shell settings put global captive_portal_http_url http://g.cn/generated_204
-%choice_end%
+adb shell || %err%
 
 :info
 cls
@@ -222,6 +206,19 @@ adb shell cat /proc/meminfo || echo 打印失败!
 %partcode%
 echo.
 echo 按任意键返回主菜单...
+pause >nul
+%menu%
+
+:credit
+cls
+echo 本程序遵循 AGPL v3 开源协议
+echo.
+echo Android小工具 V2.0.1  ---BY MilkyWeigh--- 
+echo.
+echo chkdev.bat 来自BFF ---BY 某贼---
+echo Oringal Link : https://gitee.com/mouzei/bff
+echo.
+echo 感谢你的使用!
 pause >nul
 %menu%
 

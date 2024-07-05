@@ -103,13 +103,13 @@ if "%mode%"=="-k" set mode_name=卸载，但保留保留数据和缓存文件
 echo 你选择了: %mode_name%
 set /p pkgname=输入一个非系统应用的包名后回车 :
 echo 开始卸载%pkgname%的全部...
-adb uninstall %mode% %pkgname% || echo 无效的参数. & %err%
+adb uninstall %mode% %pkgname% || %err%
 goto fini_uninst
 
 :clearapp
 set /p pkgname=输入一个非系统应用的包名后回车:
 echo 开始清理%pkgname%的数据...
-adb clear %pkgname% || echo 无效的参数. & %err%
+adb clear %pkgname% || %err%
 goto fini_uninst
 
 ::单个应用的启停
