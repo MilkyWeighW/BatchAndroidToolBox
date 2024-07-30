@@ -178,15 +178,17 @@ echo.
 goto binunpack_sigle
 
 :binunpack_all
+call public.bat getfilename
 echo 按任意键开始提取.
 pause >nul
-payload-dumper-go.exe -o .\output\unpackimg\img %binpath%
+payload-dumper-go.exe -o .\output\all_unpack\img %binpath%
 start .\output\unpackimg\img
 echo 提取完成!已打开提取目录
 pause >nul
 %menu%
 
 :img_unpack_pre
+cls
 echo.
 echo 选择一个操作：
 echo.
@@ -196,7 +198,7 @@ echo 【2】.dat转.img
 echo.
 echo 【3】.img解包
 echo.
-echo 【4】直接解包.br到img
+echo 【4】直接解包.br
 echo.
 set choice= 
 set /p choice=请输入对应数字回车：
@@ -204,7 +206,7 @@ if not "%choice%"=="" set choice=%choice:~0,1%
 if "%choice%"=="1" goto br2dat
 if "%choice%"=="2" goto dat2img
 if "%choice%"=="3" goto img_unpack
-if "%choice%"=="4" goto br2img
+if "%choice%"=="4" goto br_unpack
 %choice_end%
 
 :br2dat
@@ -216,13 +218,49 @@ brotli.exe -d %file% -o .\output\rename.dat
 %wait%
 ren .\output\rename.dat "%filename%.dat"
 start .\output\
-echo 已打开提取目录，按任意键返回上级菜单.
-pause >nul
-goto img_unpack_pre
+echo 已打开转换目录
+%defalut_over%
 
 :dat2img
 set /p file=拖入有效的.dat文件并回车:
 call public.bat getfilename
 set /p listfile=拖入与之对应的.list文件并回车:
 pause
-echo
+echo 正在转换，请等待...
+sdat2img.exe %file% %listfile% .\output\rename.img
+ren .\output\rename.dat "%filename%.dat"
+start .\output\
+echo 已打开转换目录
+%defalut_over%
+
+:img_unpack
+set /p file=拖入有效的.img文件并回车:
+call public.bat getfilename
+pause
+echo 正在转换，请等待...
+mkdir .\output\%filename%
+Imgextractor.exe %file% .\output\%filename%\ >nul
+start .\output\%filename%\
+echo 已打开转换目录
+%defalut_over%
+
+:br_unpack
+set /p file=拖入有效的.br文件并回车:
+call public.bat getfilename
+set /p listfile=拖入与之对应的.list文件并回车:
+pause
+echo 正在转换，请等待...
+if not exist .\TEMP (mkdir TEMP)
+brotli.exe -d %file% -o .\TEMP\tmp.dat
+echo 已完成(1/3)
+set file=.\TEMP\tmp.dat
+sdat2img.exe %file% %listfile% .\TEMP\tmp.img
+echo 已完成(2/3)
+set file=.\TEMP\tmp.img
+Imgextractor.exe %file% .\output\%filename%\ >nul
+echo 已完成(3/3)
+start .\output\%filename%\
+echo 已打开转换目录
+rmdir /s /q .\TEMP
+%defalut_over%
+

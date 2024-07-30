@@ -40,9 +40,26 @@ setlocal enabledelayedexpansion
 set a=!date:~0,10!
 set filename=!filename!_!a:/=_!_%time::=_%
 set filename=!filename:.=_!
+set filename=!filename: =_!
 echo %filename% > filename.txt
 endlocal
 set /p filename=<filename.txt
 del /q filename.txt
 goto :eof
 
+:pycheck
+py -V || set py_status=0 && goto :eof
+set py_status=1
+goto :eof
+
+:pyinstall
+cls
+echo Python未安装!按任意键开始安装.
+pause >nul
+PowerShell -executionpolicy bypass -Command "(wget -O C:\Python_setup.exe https://www.python.org/ftp/python/3.12.4/python-3.12.4-amd64.exe) ;cmd /c C:\Python_setup.exe /quiet TargetDir=C:\Program Files\Python InstallAllUsers=1 PrependPath=1 Include_test=0"
+if %errorlevel%==0 (
+        echo 安装成功
+) else (
+    echo 安装失败！请检查网络连接并确保系统无异常.
+)
+goto :eof
