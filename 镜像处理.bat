@@ -1,3 +1,5 @@
 @echo off
 chcp 936
-start .\bin\image.bat || color a && echo 文件被破坏! && pause
+cd .\bin
+start image.bat || color a && echo 文件被破坏! && pause
+

@@ -1,21 +1,9 @@
-@echo off
-chcp 936
-cd /d %~dp0
-title 欢迎使用Android小工具V2.
-set "wait=ping 127.0.0.1 -n 5 >nul"
-set MENU=goto menu
-set err=goto err
-set partcode=echo **********************************
-set "deltemp=if exist ".\*.txt" (del /f /q .\*.txt)"
-set "choice_end=ECHO. & ECHO. 【请输入正确的字符,等待5秒并滚回主菜单】 & ping 127.0.0.1 -n 5 >nul & ECHO. & %MENU% & cls"
-if not exist .\output (mkdir output)
-mode con cols=60 lines=30
-cls
+call public.bat head
 
 :MENU
 %deltemp%
+color b
 cls
-color 3
 echo 配合【辅助.bat】效果更佳.
 echo 如果遇到没有【返回主菜单】选项的话,输入一个错误的值即可.
 echo 请只连接一个设备,包含模拟器!
@@ -204,16 +192,3 @@ echo 感谢你的使用!
 pause >nul
 %menu%
 
-:err
-color c
-%partcode%
-echo 发生错误.
-echo 可以用上方的错误提示结合搜索引擎查找并解决错误.
-echo 按任意键返回主菜单.
-pause >nul
-%menu%
-
-:defalut_over
-echo 操作成功完成,按任意键返回主菜单.
-pause >nul
-%MENU%

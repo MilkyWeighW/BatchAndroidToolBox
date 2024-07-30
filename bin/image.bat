@@ -1,16 +1,4 @@
-@echo off
-chcp 936
-cd /d %~dp0
-title Andorid小工具v2--镜像处理
-set "wait=ping 127.0.0.1 -n 5 >nul"
-set MENU=call main.bat
-set err=goto err
-set partcode=echo **********************************
-set "deltemp=if exist ".\*.txt" (del /f /q .\*.txt)"
-set "choice_end=ECHO. & ECHO. 【请输入正确的字符,等待5秒并滚回主程序】 & ping 127.0.0.1 -n 5 >nul & ECHO. & %MENU% & cls"
-if not exist .\output (mkdir output)
-mode con cols=60 lines=30
-cls
+call public.bat head
 
 :Part_Pre
 %deltemp%
@@ -142,7 +130,7 @@ set /p package=拖入卡刷包zip文件以继续:
 for %%i in (%package%) do set filename=%%~ni
 if exist .\output\%filename% (rmdir /s /q .\output\%filename%)
 %partcode%
-7z x %package% -ooutput\%filename% 
+7z x %package% -ooutput\%filename% || echo 解压缩失败! && %err%
 %partcode%
 echo 解压完成
 for /r ".\output\%filename%" %%a in (*.bin) do (
@@ -195,19 +183,27 @@ echo 提取完成!已打开提取目录
 pause >nul
 %menu%
 
-:
-:err
-color c
-echo ***********************************************
-echo 发生错误.
-echo 可以用上方的错误提示结合搜索引擎查找并解决错误.
-echo 按任意键返回主菜单.
-pause >nul
-%menu%
+:img_unpack_pre
+echo.
+echo 选择一个操作：
+echo.
+echo 【1】.br转.dat
+echo.
+echo 【2】.dat转.img
+echo.
+echo 【3】.img解包
+echo.
+echo 【4】直接解包.br到img
+set choice= 
+set /p choice=请输入对应数字回车：
+if not "%choice%"=="" set choice=%choice:~0,1%
+if "%choice%"=="1" goto br2dat
+if "%choice%"=="2" goto dat2img
+if "%choice%"=="3" goto img_unpack
+if "%choice%"=="4" goto br2img
+%choice_end%
 
-:defalut_over
-echo 操作成功完成,按任意键返回主程序.
-pause >nul
-%MENU%
-
-
+:br2dat
+setlocal enabledelayedexpansion
+set /p file=拖入有效的.br文件并回车:
+call pubilic.bat getfilename

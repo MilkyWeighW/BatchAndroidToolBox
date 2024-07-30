@@ -1,3 +1,4 @@
 @echo off
 chcp 936
-start .\bin\main.bat || color a && echo 文件被破坏! && pause
+cd .\bin
+start main.bat || color a && echo 文件被破坏! && pause
