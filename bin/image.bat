@@ -1,6 +1,6 @@
-call public.bat head
+call public.bat head 
 
-:Part_Pre
+:menu
 %deltemp%
 color e
 cls
@@ -17,6 +17,8 @@ echo ¡¾4¡¿ÅúÁ¿Ë¢Èë
 echo. 
 echo ¡¾5¡¿ÌáÈ¡¾µÏñ 
 echo. 
+echo ¡¾6¡¿¾µÏñ½â°ü
+echo.
 set choice= 
 set /p choice=ÇëÊäÈë¶ÔÓ¦Êı×Ö»Ø³µ£º
 if not "%choice%"=="" set choice=%choice:~0,1%
@@ -25,6 +27,7 @@ if "%choice%"=="2" set mode=flash & set mode_name=Ë¢Èë & goto part_process
 if "%choice%"=="3" set mode=boot & set mode_name=Æô¶¯ & goto part_process
 if "%choice%"=="4" goto batchflash
 if "%choice%"=="5" goto part_output_pre
+if "%choice%"=="6" goto img_unpack_pre
 %choice_end%
 
 ::¡¾4¡¿ÅúÁ¿Ë¢Èë
@@ -61,8 +64,8 @@ if "%mode%"=="boot" set /p file=ÍÏÈëÒªÆô¶¯µÄÎÄ¼ş²¢»Ø³µ: & echo ½«»á°Ñ¡¾%file%¡¿Á
 set choice=
 set /p choice=¼üÈëµ¥¸öÊ××ÖÄ¸¡¾Y/N¡¿²¢»Ø³µÒÔ¼ÌĞø:
 if not "%choice%"=="" set choice=%choice:~0,1%
-if "%choice%"=="Y" fastboot %mode% %partition% %file% & goto defalut_over|| %err%
-if "%choice%"=="N" goto Part_Pre
+if "%choice%"=="Y" fastboot %mode% %partition% %file% & %defalut_over% || %err%
+if "%choice%"=="N" goto menu
 %choice_end%
 
 ::¡¾5¡¿ÌáÈ¡¾µÏñ
@@ -111,7 +114,7 @@ for /f "tokens=2 delims= " %%i in (target.txt) do (
 	%partcode%
 	setlocal enabledelayedexpansion
 	echo ´æ´¢ÓÚ%%i Â·¾¶ÏÂ£¬ÕıÔÚÌáÈ¡...
-	adb shell " su -c 'dd if=%%i of=/sdcard/%partition%.img'" || echo ·ÖÇøÌáÈ¡Ê§°Ü£¡ & %err%
+	adb shell " su -c 'dd if=%%i of=/sdcard/%partition%.img'" || echo ·ÖÇøÌáÈ¡Ê§°Ü£¡ && %err%
 	adb pull /sdcard/%partition%.img %~dp0\output\partition_readback
 	endlocal
 	%partcode%
@@ -130,7 +133,7 @@ set /p package=ÍÏÈë¿¨Ë¢°üzipÎÄ¼şÒÔ¼ÌĞø:
 for %%i in (%package%) do set filename=%%~ni
 if exist .\output\%filename% (rmdir /s /q .\output\%filename%)
 %partcode%
-7z x %package% -ooutput\%filename% || echo ½âÑ¹ËõÊ§°Ü! && %err%
+7z x %package% -ooutput\%filename% 
 %partcode%
 echo ½âÑ¹Íê³É
 for /r ".\output\%filename%" %%a in (*.bin) do (
@@ -168,7 +171,7 @@ start .\output\%filename%\img
 endlocal
 cls
 set choice= 
-set /p choice=ÌáÈ¡Íê³É!ÒÑ´ò¿ªÌáÈ¡Ä¿Â¼,¼ÌĞøÌáÈ¡¾Í»Ø³µ°É£¬ÊäÈëb¼ü·µ»ØÖ÷³ÌĞò£º
+set /p choice=ÌáÈ¡Íê³É!ÒÑ´ò¿ªÌáÈ¡Ä¿Â¼,¼ÌĞøÌáÈ¡¾Í»Ø³µ°É£¬ÊäÈëb¼ü·µ»ØÖ÷²Ëµ¥£º
 if not "%choice%"=="" set choice=%choice:~0,1%
 if "%choice%"=="b" cls & %MENU%
 echo.
@@ -194,6 +197,7 @@ echo.
 echo ¡¾3¡¿.img½â°ü
 echo.
 echo ¡¾4¡¿Ö±½Ó½â°ü.brµ½img
+echo.
 set choice= 
 set /p choice=ÇëÊäÈë¶ÔÓ¦Êı×Ö»Ø³µ£º
 if not "%choice%"=="" set choice=%choice:~0,1%
@@ -204,6 +208,21 @@ if "%choice%"=="4" goto br2img
 %choice_end%
 
 :br2dat
-setlocal enabledelayedexpansion
 set /p file=ÍÏÈëÓĞĞ§µÄ.brÎÄ¼ş²¢»Ø³µ:
-call pubilic.bat getfilename
+call public.bat getfilename
+pause
+echo ÕıÔÚ×ª»»£¬ÇëµÈ´ı...
+brotli.exe -d %file% -o .\output\rename.dat
+%wait%
+ren .\output\rename.dat "%filename%.dat"
+start .\output\
+echo ÒÑ´ò¿ªÌáÈ¡Ä¿Â¼£¬°´ÈÎÒâ¼ü·µ»ØÉÏ¼¶²Ëµ¥.
+pause >nul
+goto img_unpack_pre
+
+:dat2img
+set /p file=ÍÏÈëÓĞĞ§µÄ.datÎÄ¼ş²¢»Ø³µ:
+call public.bat getfilename
+set /p listfile=ÍÏÈëÓëÖ®¶ÔÓ¦µÄ.listÎÄ¼ş²¢»Ø³µ:
+pause
+echo
