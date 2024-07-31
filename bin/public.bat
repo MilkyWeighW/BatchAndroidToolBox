@@ -38,17 +38,18 @@ if not "%binpath%"=="" for %%i in (%binpath%) do set filename=%%~ni
 if not "%package%"=="" for %%i in (%package%) do set filename=%%~ni
 setlocal enabledelayedexpansion
 set a=!date:~0,10!
-set filename=!filename!_!a:/=_!_%time::=_%
+set filename=!filename!¡¾!a:/=_!¡¤%time::=_%¡¿
 set filename=!filename:.=_!
-set filename=!filename: =_!
 echo %filename% > filename.txt
 endlocal
 set /p filename=<filename.txt
 del /q filename.txt
+set filename=%filename: =%
+pause
 goto :eof
 
 :pycheck
-py -V || set py_status=0 && goto :eof
+py -V || goto :eof
 set py_status=1
 goto :eof
 

@@ -187,6 +187,7 @@ echo 提取完成!已打开提取目录
 pause >nul
 %menu%
 
+::img解包
 :img_unpack_pre
 cls
 echo.
@@ -222,13 +223,16 @@ echo 已打开转换目录
 %defalut_over%
 
 :dat2img
+echo.
+call public.bat pycheck
+if "%py_status%"=="1" (echo.) else (call public.bat pyinstall)
 set /p file=拖入有效的.dat文件并回车:
 call public.bat getfilename
 set /p listfile=拖入与之对应的.list文件并回车:
 pause
 echo 正在转换，请等待...
-sdat2img.exe %file% %listfile% .\output\rename.img
-ren .\output\rename.dat "%filename%.dat"
+sdat2img.py %listfile% %file% .\output\rename.img >nul
+ren .\output\rename.img "%filename%.img"
 start .\output\
 echo 已打开转换目录
 %defalut_over%
@@ -245,18 +249,21 @@ echo 已打开转换目录
 %defalut_over%
 
 :br_unpack
+echo.
 set /p file=拖入有效的.br文件并回车:
 call public.bat getfilename
 set /p listfile=拖入与之对应的.list文件并回车:
-pause
+echo 按任意键开始转换.
+pause >nul
 echo 正在转换，请等待...
 if not exist .\TEMP (mkdir TEMP)
 brotli.exe -d %file% -o .\TEMP\tmp.dat
 echo 已完成(1/3)
 set file=.\TEMP\tmp.dat
-sdat2img.exe %file% %listfile% .\TEMP\tmp.img
+sdat2img.py %listfile% %file% .\TEMP\tmp.img >nul
 echo 已完成(2/3)
 set file=.\TEMP\tmp.img
+mkdir .\output\%filename%
 Imgextractor.exe %file% .\output\%filename%\ >nul
 echo 已完成(3/3)
 start .\output\%filename%\
