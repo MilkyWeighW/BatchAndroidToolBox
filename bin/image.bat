@@ -1,18 +1,7 @@
-@echo off
-chcp 936
-cd /d %~dp0
-title AndoridÐ¡¹¤¾ßv2--¾µÏñ´¦Àí
-set "wait=ping 127.0.0.1 -n 5 >nul"
-set MENU=call main.bat
-set err=goto err
-set partcode=echo **********************************
-set "deltemp=if exist ".\*.txt" (del /f /q .\*.txt)"
-set "choice_end=ECHO. & ECHO. ¡¾ÇëÊäÈëÕýÈ·µÄ×Ö·û,µÈ´ý5Ãë²¢¹ö»ØÖ÷³ÌÐò¡¿ & ping 127.0.0.1 -n 5 >nul & ECHO. & %MENU% & cls"
-if not exist .\output (mkdir output)
-mode con cols=60 lines=30
-cls
+call public.bat head 
 
-:Part_Pre
+:menu
+title AndoridÐ¡¹¤¾ßv2--¾µÏñ´¦Àí
 %deltemp%
 color e
 cls
@@ -29,6 +18,8 @@ echo ¡¾4¡¿ÅúÁ¿Ë¢Èë
 echo. 
 echo ¡¾5¡¿ÌáÈ¡¾µÏñ 
 echo. 
+echo ¡¾6¡¿¾µÏñ½â°ü
+echo.
 set choice= 
 set /p choice=ÇëÊäÈë¶ÔÓ¦Êý×Ö»Ø³µ£º
 if not "%choice%"=="" set choice=%choice:~0,1%
@@ -37,6 +28,7 @@ if "%choice%"=="2" set mode=flash & set mode_name=Ë¢Èë & goto part_process
 if "%choice%"=="3" set mode=boot & set mode_name=Æô¶¯ & goto part_process
 if "%choice%"=="4" goto batchflash
 if "%choice%"=="5" goto part_output_pre
+if "%choice%"=="6" goto img_unpack_pre
 %choice_end%
 
 ::¡¾4¡¿ÅúÁ¿Ë¢Èë
@@ -73,8 +65,8 @@ if "%mode%"=="boot" set /p file=ÍÏÈëÒªÆô¶¯µÄÎÄ¼þ²¢»Ø³µ: & echo ½«»á°Ñ¡¾%file%¡¿Á
 set choice=
 set /p choice=¼üÈëµ¥¸öÊ××ÖÄ¸¡¾Y/N¡¿²¢»Ø³µÒÔ¼ÌÐø:
 if not "%choice%"=="" set choice=%choice:~0,1%
-if "%choice%"=="Y" fastboot %mode% %partition% %file% & goto defalut_over|| %err%
-if "%choice%"=="N" goto Part_Pre
+if "%choice%"=="Y" fastboot %mode% %partition% %file% & %defalut_over% || %err%
+if "%choice%"=="N" goto menu
 %choice_end%
 
 ::¡¾5¡¿ÌáÈ¡¾µÏñ
@@ -123,7 +115,7 @@ for /f "tokens=2 delims= " %%i in (target.txt) do (
 	%partcode%
 	setlocal enabledelayedexpansion
 	echo ´æ´¢ÓÚ%%i Â·¾¶ÏÂ£¬ÕýÔÚÌáÈ¡...
-	adb shell " su -c 'dd if=%%i of=/sdcard/%partition%.img'" || echo ·ÖÇøÌáÈ¡Ê§°Ü£¡ & %err%
+	adb shell " su -c 'dd if=%%i of=/sdcard/%partition%.img'" || echo ·ÖÇøÌáÈ¡Ê§°Ü£¡ && %err%
 	adb pull /sdcard/%partition%.img %~dp0\output\partition_readback
 	endlocal
 	%partcode%
@@ -195,19 +187,87 @@ echo ÌáÈ¡Íê³É!ÒÑ´ò¿ªÌáÈ¡Ä¿Â¼
 pause >nul
 %menu%
 
-:
-:err
-color c
-echo ***********************************************
-echo ·¢Éú´íÎó.
-echo ¿ÉÒÔÓÃÉÏ·½µÄ´íÎóÌáÊ¾½áºÏËÑË÷ÒýÇæ²éÕÒ²¢½â¾ö´íÎó.
-echo °´ÈÎÒâ¼ü·µ»ØÖ÷²Ëµ¥.
+
+::img½â°ü
+:img_unpack_pre
+cls
+echo.
+echo Ñ¡ÔñÒ»¸ö²Ù×÷£º
+echo.
+echo ¡¾1¡¿.br×ª.dat
+echo.
+echo ¡¾2¡¿.dat×ª.img
+echo.
+echo ¡¾3¡¿.img½â°ü
+echo.
+echo ¡¾4¡¿Ö±½Ó½â°ü.br
+echo.
+set choice= 
+set /p choice=ÇëÊäÈë¶ÔÓ¦Êý×Ö»Ø³µ£º
+if not "%choice%"=="" set choice=%choice:~0,1%
+if "%choice%"=="1" goto br2dat
+if "%choice%"=="2" goto dat2img
+if "%choice%"=="3" goto img_unpack
+if "%choice%"=="4" goto br_unpack
+%choice_end%
+
+:br2dat
+set /p file=ÍÏÈëÓÐÐ§µÄ.brÎÄ¼þ²¢»Ø³µ:
+call public.bat getfilename
+pause
+echo ÕýÔÚ×ª»»£¬ÇëµÈ´ý...
+brotli.exe -d %file% -o .\output\rename.dat
+%wait%
+ren .\output\rename.dat "%filename%.dat"
+start .\output\
+echo ÒÑ´ò¿ª×ª»»Ä¿Â¼
+%defalut_over%
+
+:dat2img
+echo.
+call public.bat pycheck
+if "%py_status%"=="1" (echo.) else (call public.bat pyinstall)
+set /p file=ÍÏÈëÓÐÐ§µÄ.datÎÄ¼þ²¢»Ø³µ:
+call public.bat getfilename
+set /p listfile=ÍÏÈëÓëÖ®¶ÔÓ¦µÄ.listÎÄ¼þ²¢»Ø³µ:
+pause
+echo ÕýÔÚ×ª»»£¬ÇëµÈ´ý...
+sdat2img.py %listfile% %file% .\output\rename.img >nul
+ren .\output\rename.img "%filename%.img"
+start .\output\
+echo ÒÑ´ò¿ª×ª»»Ä¿Â¼
+%defalut_over%
+
+:img_unpack
+set /p file=ÍÏÈëÓÐÐ§µÄ.imgÎÄ¼þ²¢»Ø³µ:
+call public.bat getfilename
+pause
+echo ÕýÔÚ×ª»»£¬ÇëµÈ´ý...
+mkdir .\output\%filename%
+Imgextractor.exe %file% .\output\%filename%\ >nul
+start .\output\%filename%\
+echo ÒÑ´ò¿ª×ª»»Ä¿Â¼
+%defalut_over%
+
+:br_unpack
+echo.
+set /p file=ÍÏÈëÓÐÐ§µÄ.brÎÄ¼þ²¢»Ø³µ:
+call public.bat getfilename
+set /p listfile=ÍÏÈëÓëÖ®¶ÔÓ¦µÄ.listÎÄ¼þ²¢»Ø³µ:
+echo °´ÈÎÒâ¼ü¿ªÊ¼×ª»».
 pause >nul
-%menu%
-
-:defalut_over
-echo ²Ù×÷³É¹¦Íê³É,°´ÈÎÒâ¼ü·µ»ØÖ÷³ÌÐò.
-pause >nul
-%MENU%
-
-
+echo ÕýÔÚ×ª»»£¬ÇëµÈ´ý...
+if not exist .\TEMP (mkdir TEMP)
+brotli.exe -d %file% -o .\TEMP\tmp.dat
+echo ÒÑÍê³É(1/3)
+set file=.\TEMP\tmp.dat
+sdat2img.py %listfile% %file% .\TEMP\tmp.img >nul
+echo ÒÑÍê³É(2/3)
+set file=.\TEMP\tmp.img
+mkdir .\output\%filename%
+Imgextractor.exe %file% .\output\%filename%\ >nul
+echo ÒÑÍê³É(3/3)
+start .\output\%filename%\
+echo ÒÑ´ò¿ª×ª»»Ä¿Â¼
+rmdir /s /q .\TEMP
+%defalut_over%

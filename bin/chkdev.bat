@@ -6,7 +6,6 @@
 ::            all        rechk(可选)  复查前等待秒数(默认3)
 
 @ECHO OFF
-call log chkdev.bat I 开始检查设备连接:%1
 set var1=%1& set var2=%2& set var3=%3& set var4=%4& set var5=%5& set var6=%6& set var7=%7& set var8=%8& set var9=%9
 goto %var1%
 

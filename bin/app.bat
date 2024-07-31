@@ -1,36 +1,23 @@
 ::本批处理文件支持外部参数传递
 ::用法	: call 应用管理.bat [MODE] [FILE]
 ::
-::例如	: call 应用管理.bat skipchk 			【跳过adb设备连接校验】
-::		: call 应用管理.bat uninstall 1.txt		【卸载1.txt中所含包名】
-::							disable				停用
-::							enable				启用
-
-@echo off
-color b
-chcp 936
-cd /d %~dp0
-title Android小工具V2--应用管理
-set "wait=ping 127.0.0.1 -n 5 >nul"
-set err=goto err
-set MENU=call main.bat
-set "deltemp=if exist ".\*.txt" (del /f /q .\*.txt)"
-set partcode=echo **********************************
-set "choice_end=ECHO. & ECHO. 【请输入正确的字符,等待5秒并滚回主程序】 & ping 127.0.0.1 -n 5 >nul & ECHO. & %MENU% & cls"
-set skip=0
-mode con cols=60 lines=30
-cls
+::例如	: call 应用管理.bat skipchk 			 【跳过adb设备连接校验】
+::		: call 应用管理.bat uninstall 1.txt	    【卸载1.txt中所含包名】
+::							disable			   【卸载1.txt中所含包名】
+::							enable			   【卸载1.txt中所含包名】
+call public.bat head
 
 ::接受参数
 set command=%1
-if "%command%"=="skipchk" ( set skip=1 & goto app ) 
+if "%command%"=="skipchk" ( set skip=1 & goto menu ) 
 if "%command%"=="uninstall" ( set directly_process=1 & set "mode=uninstall" & set file=%2 & goto uninstall_diable_enable_Multiple_excute ) 
 if "%command%"=="disable" ( set directly_process=1 & set "mode=shell pm disable-user" & set file=%2 & goto uninstall_diable_enable_Multiple_excute ) 
 if "%command%"=="enable" ( set directly_process=1 & set "mode=shell enable" & set file=%2 & goto uninstall_diable_enable_Multiple_excute ) 
 
 
 ::应用管理部分
-:app
+:menu
+color 3
 if "%skip%"=="0" ( echo 请先将设备连接adb & call chkdev.bat system & call app.bat skipchk)
 %deltemp%
 cls
@@ -74,7 +61,7 @@ echo 【1】卸载应用/清除数据
 echo 【2】停用应用(单个) 【3】停用应用(批量) 
 echo 【4】启用应用(单个) 【5】启用应用(批量) 
 echo 【6】提取单个应用安装包 
-echo 【7】回到上一级 【8】退回主菜单
+echo 【7】回到上一级 
 set choice=
 set mode=
 set /p choice=请输入对应数字回车：
@@ -85,8 +72,7 @@ if "%choice%"=="3" set "mode=shell pm disable-user" & goto uninstall_diable_enab
 if "%choice%"=="4" set "mode=shell enable" & goto disable_enable_app_Single
 if "%choice%"=="5" set "mode=shell enable" & goto uninstall_diable_enable_Multiple
 if "%choice%"=="6" goto apkout
-if "%choice%"=="7" goto app
-if "%choice%"=="8" %menu%
+if "%choice%"=="7" %menu%
 %choice_end%
 
 ::卸载单个应用
@@ -164,7 +150,7 @@ for /f  %%i in (%file%)  do (
 set target=%%i
 adb %mode% !target! || goto err
 ) 
-if "%directly_process%"=="1" goto defalut_over
+if "%directly_process%"=="1" %defalut_over%
 goto fini_uninst_disable_enable
 
 :fini_uninst_disable_enable
@@ -185,16 +171,4 @@ pause
 cls
 goto app1
 
-:err
-color c
-%partcode%
-echo 发生错误.
-echo 可以用上方的错误提示结合搜索引擎查找并解决错误.
-echo 按任意键返回主菜单.
-pause >nul
-%menu%
 
-:defalut_over
-echo 操作成功完成,按任意键返回主程序.
-pause >nul
-%MENU%
