@@ -1,9 +1,10 @@
 call public.bat head
 
 :MENU
+title 欢迎使用Android小工具V2.
 %deltemp%
-color b
 cls
+color b
 echo 配合【辅助.bat】效果更佳.
 echo 如果遇到没有【返回主菜单】选项的话,输入一个错误的值即可.
 echo 请只连接一个设备,包含模拟器!
@@ -20,7 +21,7 @@ echo 【4】杂项功能.
 echo.
 echo 【5】手机信息查看.
 echo.
-echo 【6】单个应用安装.
+echo 【6】应用安装.
 echo.
 echo 【7】线刷（打开空命令行）.
 echo.
@@ -34,17 +35,38 @@ set /p choice=请输入对应数字回车：
 if not "%choice%"=="" set choice=%choice:~0,1%
 if "%choice%"=="1" call image.bat
 if "%choice%"=="2" goto sideload
-if "%choice%"=="3" echo 请先将设备连接adb & call call chkdev.bat system & call app.bat skipchk
+if "%choice%"=="3" echo 请先将设备连接adb & call chkdev.bat system & call app.bat skipchk
 if "%choice%"=="4" goto others
 if "%choice%"=="5" goto info
 if "%choice%"=="6" goto installapp
 if "%choice%"=="7" goto batFlash
 if "%choice%"=="8" adb kill-server & adb start-server & echo 重启完毕! & %wait% & %menu%
-if "%choice%"=="9" goto credit
+if "%choice%"=="9" goto about
 %choice_end%
 
-::应用安装
-:installapp
+::应用安装（单个）
+:installapp_batch
+set /p path=拖入含有apk文件的文件夹:
+%partcode%
+echo 所有文件如下:
+dir %path% /b > apks.txt
+type apks.txt
+%partcode%
+echo 将会安装这些文件，按任意键继续
+pause
+for /f "tokens=1 delims=. " %%i in (apks.txt) do (
+    setlocal enabledelayedexpansion
+    %partcode%
+    echo 正在安装%%i...
+    set "file=%path%\%%i.apk"
+    adb install !file!
+    endlocal
+)
+echo 安装完成,按任意键返回主程序
+pause >nul
+%menu%
+
+:installapp_single
 echo.
 set /p file=拖入apk安装包,然后回车.
 echo 开始安装...
@@ -177,18 +199,42 @@ echo 按任意键返回主菜单...
 pause >nul
 %menu%
 
-:credit
+:about
 cls
-echo 本程序遵循 AGPL v3 开源协议
-echo.
-echo Android小工具 V2.1.0  ---BY MilkyWeigh--- 
+echo 本程序遵循 AGPL v3 开源协议,以下排名不分先后
 echo.
 echo chkdev.bat 来自BFF ---BY 某贼---
 echo Oringal Link : https://gitee.com/mouzei/bff
 echo.
 echo.payload-dumper-go.exe ---BY ssut---
 echo.Oringal Link : https://github.com/ssut/payload-dumper-go
+echo.
+echo brotli 
+echo Oringal Link : https://github.com/google/brotli
+echo.
+echo ImgExtractor version 1.3.6 
+echo <Created by And_PDA (Based on sources ext4_unpacker)>
+echo.
+echo sdat2img.py
+echo AUTHORS: xpirt - luxi78 - howellzhu
+echo Oringal Link : https://github.com/xpirt/sdat2img
+echo.
+echo Android小工具 V2.1.0  ---BY MilkyWeigh--- 
+echo.
 echo 感谢你的使用!
 pause >nul
 %menu%
 
+:err
+color c
+%partcode%
+echo 发生错误.
+echo 可以用上方的错误提示结合搜索引擎查找并解决错误.
+echo 按任意键返回主菜单.
+pause >nul
+%menu%
+
+:defalut_over
+echo 操作成功完成,按任意键返回主菜单.
+pause >nul
+%MENU%

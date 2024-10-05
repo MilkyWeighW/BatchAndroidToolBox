@@ -1,6 +1,7 @@
 call public.bat head 
 
 :menu
+title Andorid小工具v2--镜像处理
 %deltemp%
 color e
 cls
@@ -171,21 +172,21 @@ start .\output\%filename%\img
 endlocal
 cls
 set choice= 
-set /p choice=提取完成!已打开提取目录,继续提取就回车吧，输入b键返回主菜单：
+set /p choice=提取完成!已打开提取目录,继续提取就回车吧，输入b键返回主程序：
 if not "%choice%"=="" set choice=%choice:~0,1%
 if "%choice%"=="b" cls & %MENU%
 echo.
 goto binunpack_sigle
 
 :binunpack_all
-call public.bat getfilename
 echo 按任意键开始提取.
 pause >nul
-payload-dumper-go.exe -o .\output\all_unpack\img %binpath%
+payload-dumper-go.exe -o .\output\unpackimg\img %binpath%
 start .\output\unpackimg\img
 echo 提取完成!已打开提取目录
 pause >nul
 %menu%
+
 
 ::img解包
 :img_unpack_pre
@@ -270,4 +271,3 @@ start .\output\%filename%\
 echo 已打开转换目录
 rmdir /s /q .\TEMP
 %defalut_over%
-

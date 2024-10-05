@@ -1,4 +1,4 @@
 @echo off
 chcp 936
 cd .\bin
-start app.bat || color a && echo 文件被破坏! && pause
+start .\app.bat || color a && echo 文件被破坏! && pause

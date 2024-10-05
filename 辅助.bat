@@ -1,4 +1,4 @@
 @echo off
 chcp 936
 cd .\bin
-start ancillary.bat || color a && echo 文件被破坏! && pause
+start .\ancillary.bat || color a && echo 文件被破坏! && pause

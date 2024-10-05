@@ -1,11 +1,10 @@
-set var1=%1
-goto %var1%
+set command=%1
+goto %command%
 
 :head
 @echo off
 chcp 936
 cd /d %~dp0
-title 欢迎使用Android小工具V2.
 set "wait=ping 127.0.0.1 -n 5 >nul"
 set MENU=goto menu
 set "err=call public.bat err & goto menu"
@@ -13,10 +12,14 @@ set "defalut_over=call public.bat defalut_over & goto menu"
 set partcode=echo **********************************
 set "deltemp=if exist ".\*.txt" (del /f /q .\*.txt)"
 set "choice_end=ECHO. & ECHO. 【请输入正确的字符,等待5秒并滚回主菜单】 & ping 127.0.0.1 -n 5 >nul & ECHO. & %MENU% & cls"
-if not exist .\output (mkdir output)
+if exist ".\temp" (rmdir /s /q temp)
+if exist ".\output" (rmdir /s /q output)
+mkdir output
+mkdir temp
 mode con cols=60 lines=30
 cls
 goto :eof
+
 
 :err
 color c
@@ -45,7 +48,6 @@ endlocal
 set /p filename=<filename.txt
 del /q filename.txt
 set filename=%filename: =%
-pause
 goto :eof
 
 :pycheck
@@ -63,4 +65,49 @@ if %errorlevel%==0 (
 ) else (
     echo 安装失败！请检查网络连接并确保系统无异常.
 )
+goto :eof
+:get_string_length
+@echo off & setlocal enabledelayedexpansion
+set arg1=%~2
+set count=0
+if not defined arg1 goto :eof
+:get_string_length_loop
+if not "!arg1:~%count%,1!" == "" (
+    set /a count+=1
+    goto get_string_length_loop
+)
+echo %count%
+goto :eof
+
+:combine_2txts
+set "file1=%2"
+set "file2=%3"
+set "output=%4"
+@echo off
+for /f "delims=U" %%a in ('cmd/u/cecho 唉')do set "tab=%%a"
+(for /f "delims=" %%i in ('type %file1%') do (
+    setlocal enabledelayedexpansion
+    set i=%%i
+    set /p str=
+    echo !i! %tab% !str!
+    endlocal
+))<%file2% >%output%
+goto :eof
+
+:convert_encode_utf82ANSI
+::UTF-8 to ANSI
+::UTF-8 → Unicode
+CHCP 65001
+::如果输入的 UTF-8 没有 BOM，%~dpn2_unicode-without-BOM.txt 打开乱码
+CMD /D /U /C  TYPE %~2 > %~dpn2_unicode-without-BOM.txt
+::取得 Unicode BOM
+ECHO.//4=>U.bom
+certutil -decode -f U.bom U.bom >NUL
+::Unicode → Unicode BOM
+CHCP 936 >nul
+MOVE /y  U.bom  %~dpn2_Unicode-BOM.txt >NUL
+TYPE %~dpn2_unicode-without-BOM.txt >> %~dpn2_Unicode-BOM.txt
+::Unicode BOM → ANSI
+TYPE %~dpn2_Unicode-BOM.txt > %~dpn2_ANSI.txt
+DEL /Q /F %~dpn2_unicode-without-BOM.txt %~dpn2_Unicode-BOM.txt
 goto :eof

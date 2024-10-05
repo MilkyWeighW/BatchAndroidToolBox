@@ -1,11 +1,12 @@
 ::本批处理文件支持外部参数传递
 ::用法	: call 应用管理.bat [MODE] [FILE]
 ::
-::例如	: call 应用管理.bat skipchk 			【跳过adb设备连接校验】
-::		: call 应用管理.bat uninstall 1.txt		【卸载1.txt中所含包名】
-::							disable				停用
-::							enable				启用
+::例如	: call 应用管理.bat skipchk 			 【跳过adb设备连接校验】
+::		: call 应用管理.bat uninstall 1.txt	    【卸载1.txt中所含包名】
+::							disable			   【卸载1.txt中所含包名】
+::							enable			   【卸载1.txt中所含包名】
 call public.bat head
+color 3
 
 ::接受参数
 set command=%1
@@ -17,51 +18,44 @@ if "%command%"=="enable" ( set directly_process=1 & set "mode=shell enable" & se
 
 ::应用管理部分
 :menu
-color 3
-if "%skip%"=="0" ( echo 请先将设备连接adb & call chkdev.bat system & call app.bat skipchk)
-%deltemp%
-cls
-echo 将会展示应用列表,选择一个选项继续.
+title 应用管理
+echo.
+echo 将会输出应用列表,选择一个选项继续.
 echo.
 echo 【1】展示第三方应用列表.
-echo.
 echo 【2】展示系统应用列表.
-echo.
 echo 【3】我全都要!
 echo.
 set choice= 
 set /p choice=请输入对应数字回车：
 if not "%choice%"=="" set choice=%choice:~0,1%
-if "%choice%"=="1" set listmode=第三方 & adb shell pm list packages -3 > temp.txt & goto output || %err%
-if "%choice%"=="2" set listmode=系统 & adb shell pm list packages -s > temp.txt & goto output || %err%
-if "%choice%"=="3" set listmode=全部 & adb shell pm list packages > temp.txt & goto output|| %err%
+if "%choice%"=="1" (
+    call monitor applist_output -3 
+    start cmd /k type %~dp0output\app_processed.txt 
+    goto app1
+)
+if "%choice%"=="2" (
+    call monitor applist_output -s 
+    start cmd /k type %~dp0output\app_processed.txt 
+    goto app1
+)
+if "%choice%"=="3" (
+    call monitor applist_output
+    start cmd /k type %~dp0output\app_processed.txt 
+    goto app1
+)
 %choice_end%
-
-::处理生成的文本
-:output
-(for /f "usebackq delims=" %%i in ("temp.txt")do (
-	echo %%i>con
-	set h=%%i
-	setlocal enabledelayedexpansion
-	echo !h:~8!
-	endlocal
-))>处理后的app列表.txt
-del /f /q temp.txt
-cls
-goto app1
 
 ::处理方式选择
 :app1
-%partcode%
-type 处理后的app列表.txt
-%partcode%
+title 应用管理
 echo. 
-echo 已打印%listmode%应用的列表!请选择一个操作.
+echo 已打印应用列表!请选择一个操作.
 echo 【1】卸载应用/清除数据 
 echo 【2】停用应用(单个) 【3】停用应用(批量) 
 echo 【4】启用应用(单个) 【5】启用应用(批量) 
 echo 【6】提取单个应用安装包 
-echo 【7】回到上一级 【8】退回主菜单
+echo 【7】回到上一级 
 set choice=
 set mode=
 set /p choice=请输入对应数字回车：
@@ -72,8 +66,7 @@ if "%choice%"=="3" set "mode=shell pm disable-user" & goto uninstall_diable_enab
 if "%choice%"=="4" set "mode=shell enable" & goto disable_enable_app_Single
 if "%choice%"=="5" set "mode=shell enable" & goto uninstall_diable_enable_Multiple
 if "%choice%"=="6" goto apkout
-if "%choice%"=="7" goto menu
-if "%choice%"=="8" %menu%
+if "%choice%"=="7" %menu%
 %choice_end%
 
 ::卸载单个应用
@@ -165,8 +158,12 @@ setlocal enabledelayedexpansion
 set /p app_pkgname=键入想要提取应用的包名:
 for /f "delims=" %%i in ('adb shell pm path %app_pkgname%') do set path_package=%%i 
 set path_package=!path_package:~8!
-adb pull %path_package% %~dp0output\%app_pkgname%.apk
-echo 已提取【%app_pkgname%】的安装包至本程序output目录下.
+echo.
+echo 正在提取，请稍等...
+adb pull %path_package% %~dp0output\%app_pkgname%.apk >nul
+echo.
+echo 已提取【%app_pkgname%】的安装包至
+echo %~dp0output目录下. & start %~dp0output 
 endlocal
 pause
 cls
