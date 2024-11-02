@@ -1,26 +1,90 @@
 ::本批处理文件支持外部参数传递
-::用法	: call 应用管理.bat [MODE] [FILE]
-::
-::例如	: call 应用管理.bat skipchk 			 【跳过adb设备连接校验】
-::		: call 应用管理.bat uninstall 1.txt	    【卸载1.txt中所含包名】
-::							disable			   【卸载1.txt中所含包名】
-::							enable			   【卸载1.txt中所含包名】
+::用法	: call app.bat [MODE] [FILE]
+::		: call app.bat uninstall 1.txt	    【卸载1.txt中所含包名】
+::					   disable			   【卸载1.txt中所含包名】
+::					   enable			   【卸载1.txt中所含包名】
 call public.bat head
 color 3
 
 ::接受参数
 set command=%1
-if "%command%"=="skipchk" ( set skip=1 & goto menu ) 
 if "%command%"=="uninstall" ( set directly_process=1 & set "mode=uninstall" & set file=%2 & goto uninstall_diable_enable_Multiple_excute ) 
 if "%command%"=="disable" ( set directly_process=1 & set "mode=shell pm disable-user" & set file=%2 & goto uninstall_diable_enable_Multiple_excute ) 
 if "%command%"=="enable" ( set directly_process=1 & set "mode=shell enable" & set file=%2 & goto uninstall_diable_enable_Multiple_excute ) 
 
 
 ::应用管理部分
+
+::处理方式选择
 :menu
 title 应用管理
+echo. 
+echo 请选择一个操作.
 echo.
-echo 将会输出应用列表,选择一个选项继续.
+echo 【0】输出应用列表
+echo.
+echo 【1】卸载应用/清除数据 
+echo.
+echo 【2】停用应用(单个) 【3】停用应用(批量) 
+echo.
+echo 【4】启用应用(单个) 【5】启用应用(批量) 
+echo.
+echo 【6】提取单个应用安装包 
+echo.
+echo 【7】安装应用(单个) 【8】安装应用(批量)
+echo.
+set choice=
+set mode=
+set /p choice=请输入对应数字回车：
+if not "%choice%"=="" set choice=%choice:~0,1%
+if "%choice%"=="0" goto applist_output
+if "%choice%"=="1" goto uninstall_clear_app
+if "%choice%"=="2" set "mode=shell pm disable-user" & goto disable_enable_app_Single
+if "%choice%"=="3" set "mode=shell pm disable-user" & goto uninstall_diable_enable_Multiple
+if "%choice%"=="4" set "mode=shell enable" & goto disable_enable_app_Single
+if "%choice%"=="5" set "mode=shell enable" & goto uninstall_diable_enable_Multiple
+if "%choice%"=="6" goto apkout
+%choice_end%
+
+:installapp_batch
+set /p path=拖入含有apk文件的文件夹:
+%partcode%
+echo 所有文件如下:
+dir %path% /b > apks.txt
+type apks.txt
+%partcode%
+echo 将会安装这些文件，按任意键继续
+pause
+for /f "tokens=1 delims=. " %%i in (apks.txt) do (
+    setlocal enabledelayedexpansion
+    %partcode%
+    echo 正在安装%%i...
+    set "file=%path%\%%i.apk"
+    adb install !file!
+    endlocal
+)
+echo 安装完成,按任意键返回主程序
+pause >nul
+%menu%
+
+:installapp_single
+echo.
+set /p file=拖入apk安装包,然后回车.
+
+echo 开始安装...
+adb install %file% || %err%
+echo 完成!按任意键继续安装,输入【b】返回.
+set choice= 
+set /p choice=继续安装就回车吧：
+if not "%choice%"=="" set choice=%choice:~0,1%
+if "%choice%"=="b" cls & %MENU%
+echo.
+goto installapp
+
+:applist_output
+title 应用管理
+echo.
+echo 选择一个选项继续.
 echo.
 echo 【1】展示第三方应用列表.
 echo 【2】展示系统应用列表.
@@ -32,41 +96,18 @@ if not "%choice%"=="" set choice=%choice:~0,1%
 if "%choice%"=="1" (
     call monitor applist_output -3 
     start cmd /k type %~dp0output\app_processed.txt 
-    goto app1
+    goto menu
 )
 if "%choice%"=="2" (
     call monitor applist_output -s 
     start cmd /k type %~dp0output\app_processed.txt 
-    goto app1
+    goto menu
 )
 if "%choice%"=="3" (
     call monitor applist_output
     start cmd /k type %~dp0output\app_processed.txt 
-    goto app1
+    goto menu
 )
-%choice_end%
-
-::处理方式选择
-:app1
-title 应用管理
-echo. 
-echo 已打印应用列表!请选择一个操作.
-echo 【1】卸载应用/清除数据 
-echo 【2】停用应用(单个) 【3】停用应用(批量) 
-echo 【4】启用应用(单个) 【5】启用应用(批量) 
-echo 【6】提取单个应用安装包 
-echo 【7】回到上一级 
-set choice=
-set mode=
-set /p choice=请输入对应数字回车：
-if not "%choice%"=="" set choice=%choice:~0,1%
-if "%choice%"=="1" goto uninstall_clear_app
-if "%choice%"=="2" set "mode=shell pm disable-user" & goto disable_enable_app_Single
-if "%choice%"=="3" set "mode=shell pm disable-user" & goto uninstall_diable_enable_Multiple
-if "%choice%"=="4" set "mode=shell enable" & goto disable_enable_app_Single
-if "%choice%"=="5" set "mode=shell enable" & goto uninstall_diable_enable_Multiple
-if "%choice%"=="6" goto apkout
-if "%choice%"=="7" %menu%
 %choice_end%
 
 ::卸载单个应用
@@ -118,7 +159,7 @@ pause >nul
 adb %mode% %pkgname% || %err%
 echo 操作成功完成!按任意键返回上级菜单.
 pause >nul
-goto app1
+goto menu
 
 ::多行处理部分
 :uninstall_diable_enable_Multiple
@@ -150,7 +191,7 @@ goto fini_uninst_disable_enable
 :fini_uninst_disable_enable
 echo 完成%mode_name%,按任意键返回上上级菜单.
 pause >nul
-goto app1
+goto menu
 
 ::提取应用安装包
 :apkout
@@ -167,6 +208,6 @@ echo %~dp0output目录下. & start %~dp0output
 endlocal
 pause
 cls
-goto app1
+goto menu
 
 

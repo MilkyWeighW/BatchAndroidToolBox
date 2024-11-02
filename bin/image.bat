@@ -5,7 +5,7 @@ title Andorid小工具v2--镜像处理
 %deltemp%
 color e
 cls
-%partcode%
+echo.
 echo 选择一个操作：
 echo. 
 echo 【1】擦除
