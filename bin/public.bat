@@ -36,13 +36,14 @@ pause >nul
 goto :eof 
 
 :getfilename
+set filename=
 if not "%file%"=="" for %%i in (%file%) do set filename=%%~ni
 if not "%binpath%"=="" for %%i in (%binpath%) do set filename=%%~ni
 if not "%package%"=="" for %%i in (%package%) do set filename=%%~ni
 setlocal enabledelayedexpansion
 set a=!date:~0,10!
-set filename=!filename!¡¾!a:/=_!¡¤%time::=_%¡¿
-set filename=!filename:.=_!
+set filename=!filename!!a:/=!_%time::=%
+set filename=!filename:.=!
 echo %filename% > filename.txt
 endlocal
 set /p filename=<filename.txt
@@ -79,17 +80,51 @@ if not "!arg1:~%count%,1!" == "" (
 echo %count%
 goto :eof
 
+:align
+@echo off
+setlocal enabledelayedexpansion
+set input=%2
+for /f "tokens=1 delims=" %%i in ('dir /b %input%') do (
+    set "input_name=%%i"
+)
+set /a m=line=1&set "act=set/p=,&set/a m=1"
+for %%i in ("%input%") do fsutil file creATenew "%input%.zero" %%~zi >nul
+(for /f "tokens=2" %%a in ('fc /b "%input%" "%input%.zero"^|findstr /irc:"[0-9A-F]*: [0-9A-F][0-9A-F] 00"') do (
+    if /i "%%a"=="0A" (echo,&set/a m=1,line+=1,col=0) else if /i "%%a"=="0D" (echo,
+        for %%l in (!line!) do for /l %%i in (1,1,!col!) do (
+            if !C%%i_%%l! gtr !C%%imax! set/a C%%imax=C%%i_%%l
+            set "C%%i_%%l="
+            ) ) else if /i "%%a"=="20" (%act%) else if /i "%%a"=="09" (%act%) else (
+                    set/p=%%a
+                    set /a col+=m,m=0
+                    set /a C!col!_!line!+=1
+                   )
+        ))<nul >"%input%.temp"
+(for /f "delims=" %%a in (%input%.temp) do (
+    set /a col=0
+    for %%i in (%%a) do (
+        set /a col+=1&set "space="
+        set /a size=C!col!max,len=size*2+2
+        for /l %%i in (1,1,!size!) do set "space=!space!20"
+        set "outstr=%%i!space!"
+        for %%i in (!len!) do echo,!outstr:~0,%%i!
+        )   
+    set /p =0d0a
+)   )<nul >".\temp\out_%input_name%"
+del /q "%input%.zero" "%input%.temp" 
+certutil -decodehex -f ".\temp\out_%input_name%" ".\temp\out_%input_name%" >nul
+goto :eof
+
 :combine_2txts
 set "file1=%2"
 set "file2=%3"
 set "output=%4"
 @echo off
-for /f "delims=U" %%a in ('cmd/u/cecho °¦')do set "tab=%%a"
 (for /f "delims=" %%i in ('type %file1%') do (
     setlocal enabledelayedexpansion
     set i=%%i
     set /p str=
-    echo !i! %tab% !str!
+    echo !i! !str!
     endlocal
 ))<%file2% >%output%
 goto :eof

@@ -227,19 +227,13 @@ goto :eof
 :listen
 ::可被外部调用的模块
 title adb状态-应用监听器
-if "%var1%" == "" (
-    echo.
-) else (
-    call chkdev system >nul
-)
-
+call chkdev system >nul
 echo.
 echo --%date%,%time%--
 setlocal enabledelayedexpansion
 for /f "tokens=3 delims= " %%a in ('adb shell dumpsys window ^| findstr mCurrentFocus') do (
     set "packageName=%%a"
 )
-
 for /f "tokens=1 delims=/" %%b in ("%packageName%") do (
     set "packageName=%%b"
 )
@@ -253,28 +247,35 @@ goto listen
 
 :listapp
 echo.
-echo 将会输出应用列表,选择一个选项继续.
+echo 选择一个选项继续.
 echo.
-echo 【1】展示第三方应用列表.
-echo 【2】展示系统应用列表.
-echo 【3】我全都要!
+echo 【1】第三方应用列表.
+echo 【2】系统应用列表.
+echo 【3】禁用应用列表.
+echo 【4】我全都要!
 echo.
 set choice= 
 set /p choice=请输入对应数字回车：
 if not "%choice%"=="" set choice=%choice:~0,1%
+set fini=
 if "%choice%"=="1" (
     call monitor applist_output -3 
-    start cmd /k type %~dp0output\app_processed.txt 
+    start cmd /k type .\output\*.txt || %err%
     goto adb_defalutover
 )
 if "%choice%"=="2" (
     call monitor applist_output -s 
-    start cmd /k type %~dp0output\app_processed.txt 
+    start cmd /k type .\output\*.txt || %err%
     goto adb_defalutover
 )
 if "%choice%"=="3" (
+    call monitor applist_output -d 
+    start cmd /k type .\output\*.txt || %err%
+    goto adb_defalutover
+)
+if "%choice%"=="4" (
     call monitor applist_output
-    start cmd /k type %~dp0output\app_processed.txt 
+    start cmd /k type .\output\*.txt || %err%
     goto adb_defalutover
 )
 %choice_end%
@@ -282,64 +283,86 @@ if "%choice%"=="3" (
 :applist_output
 ::可被外部调用的模块
 title adb状态-应用列表打印器
-if "%var1%" == "" (
-    echo.
-) else (
-    call chkdev system >nul
-)
-
+call chkdev system >nul
 set "listmode=%2"
-adb shell pm list packages %listmode% > .\temp\app.txt
+for /f "tokens=1 delims=" %%a in ('Adb shell getprop ro.product.model') do (
+    set "device_name=%%a"
+)
 echo.
 echo 请稍等,正在处理应用及其列表...
 echo 这可能需要较长时间
 echo.
+
+::输出应用包名列表（含package前缀）
+adb shell pm list packages %listmode% > .\temp\app.txt
 (for /f "usebackq delims=" %%i in (".\temp\app.txt")do (
 	set pkgname=%%i
 	setlocal enabledelayedexpansion
     ::去除前面的"package:"
 	echo !pkgname:~8!
 	endlocal
-))>.\temp\app_pkgname.txt
-del /f /q .\temp\app.txt
-(for /f "usebackq delims=" %%a in (".\temp\app_pkgname.txt")do (
+))>.\output\app_pkgname.txt 
+
+::输出应用包名对应的安装包路径
+(for /f "usebackq delims=" %%a in (".\output\app_pkgname.txt")do (
     setlocal enabledelayedexpansion
     set "pkgname=%%a"
-    adb shell pm path !pkgname!
-    endlocal          
-))>.\temp\app.txt
-(for /f "usebackq delims=" %%a in (".\temp\app.txt")do (
-    setlocal enabledelayedexpansion
-    set "pkgpath=%%a"
-    echo !pkgpath:~8!
+    adb shell pm path !pkgname! > .\temp\app_path_temp.txt
+    ::截取第一行,避免多行出错
+    set /p line=<.\temp\app_path_temp.txt
+    echo !line:~8!
     endlocal          
 ))>.\temp\app_path.txt
-del /f /q .\temp\app.txt
-::获取应用名
+
+::获取应用名(!!需要32位支持)
 echo 正在发送工具包...
-adb push aapt2-arm64 /data/local/tmp >nul
-adb shell chmod 0755 /data/local/tmp/aapt2-arm64 >nul
-for /f "usebackq delims=" %%a in (".\temp\app_path.txt")do (
+echo.
+@adb push aapt2-arm64 /data/local/tmp && echo 发送成功
+@adb shell chmod 0755 /data/local/tmp/aapt2-arm64 && echo 授权成功
+
+(for /f "usebackq delims=" %%a in (".\temp\app_path.txt")do (
     setlocal enabledelayedexpansion
     set "pkgpath=%%a"
-    adb shell /data/local/tmp/aapt2-arm64 d badging !pkgpath! | findstr /c:"application-label:" >> .\temp\app_label.txt
+    adb shell /data/local/tmp/aapt2-arm64 d badging !pkgpath! > .\temp\app_det_info.txt
+    ::找不到应用名就用=过编码转换
+    type .\temp\app_det_info.txt | findstr /c:"application-label:" || echo =Noname=
     endlocal          
-)
+))>.\temp\app_label.txt
+::转换编码，避免输出乱码
 call public convert_encode_utf82ANSI .\temp\app_label.txt
-for /f "usebackq delims=" %%a in (".\temp\app_label_ANSI.txt")do (
-    set "appName=%%a"
+    for /f "usebackq delims=" %%a in (".\temp\app_label_ANSI.txt")do (
     setlocal enabledelayedexpansion
-    set appName=!appName:'=! 
-    echo !appName:~18!
-    endlocal          
+    set "appName=%%a"
+    if "!appName!"=="=Noname=" (
+        echo !appName:Noname=无应用名!
+    ) else (
+        ::去除无用元素
+        set appName=!appName:'=! 
+        set appName=!appName: =! 
+        echo !appName:~18!  
+    )
+    endlocal
 )>>.\temp\appName.txt
-call public combine_2txts .\temp\appName.txt .\temp\app_pkgname.txt .\output\app_processed.txt
+call public combine_2txts .\temp\appName.txt .\output\app_pkgname.txt .\temp\app_processed_before.txt
+::加入首行标识，同下面一并整理
+(echo 应用名称 包名
+echo.
+type .\temp\app_processed_before.txt
+)>.\temp\app_processed.txt
+::将文件对齐
+call public align .\temp\app_processed.txt
+@copy .\temp\out_app_processed.txt .\output\
+call public getfilename
+::重命名文件
+rename .\output\out_app_processed.txt [%device_name%]app_combined%listmode%_%filename%.txt
+rename .\output\app_pkgname.txt [%device_name%]app_pkgname%listmode%_%filename%.txt
+cls
+echo 应用列表文件已保存于output目录下
+::清理变量及缓存
+set device_name= & set listmode=  & set filename=
 @rmdir /s /q temp
 @mkdir temp
 echo.
-cls
-echo 应用列表文件已保存于
-echo 【%~dp0output\app_processed.txt】.
 goto :eof
 
 :adb_defalutover

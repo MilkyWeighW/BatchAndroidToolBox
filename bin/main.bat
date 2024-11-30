@@ -193,7 +193,7 @@ echo brotli
 echo Oringal Link : https://github.com/google/brotli
 echo.
 echo ImgExtractor version 1.3.6 
-echo <Created by And_PDA (Based on sources ext4_unpacker)>
+echo ^<Created by And_PDA (Based on sources ext4_unpacker)^>
 echo.
 echo sdat2img.py
 echo AUTHORS: xpirt - luxi78 - howellzhu

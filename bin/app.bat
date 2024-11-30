@@ -4,7 +4,6 @@
 ::					   disable			   【卸载1.txt中所含包名】
 ::					   enable			   【卸载1.txt中所含包名】
 call public.bat head
-color 3
 
 ::接受参数
 set command=%1
@@ -17,6 +16,7 @@ if "%command%"=="enable" ( set directly_process=1 & set "mode=shell enable" & se
 
 ::处理方式选择
 :menu
+color 3
 title 应用管理
 echo. 
 echo 请选择一个操作.
@@ -44,6 +44,8 @@ if "%choice%"=="3" set "mode=shell pm disable-user" & goto uninstall_diable_enab
 if "%choice%"=="4" set "mode=shell enable" & goto disable_enable_app_Single
 if "%choice%"=="5" set "mode=shell enable" & goto uninstall_diable_enable_Multiple
 if "%choice%"=="6" goto apkout
+if "%choice%"=="7" goto installapp_single
+if "%choice%"=="8" goto installapp_batch
 %choice_end%
 
 :installapp_batch
@@ -69,8 +71,8 @@ pause >nul
 
 :installapp_single
 echo.
+set file=
 set /p file=拖入apk安装包,然后回车.
-
 echo 开始安装...
 adb install %file% || %err%
 echo 完成!按任意键继续安装,输入【b】返回.
