@@ -1,53 +1,54 @@
 call public.bat head
 
 :MENU
-title »¶Ó­Ê¹ÓÃAndroidÐ¡¹¤¾ßV2.
+title æ¬¢è¿Žä½¿ç”¨Androidå°å·¥å…·V2.
 %deltemp%
 cls
 color b
-echo Èç¹ûÓöµ½Ã»ÓÐ¡¾·µ»ØÖ÷²Ëµ¥¡¿Ñ¡ÏîµÄ»°,ÊäÈëÒ»¸ö´íÎóµÄÖµ¼´¿É.
-echo ÇëÖ»Á¬½ÓÒ»¸öÉè±¸,°üº¬Ä£ÄâÆ÷!
+echo å¦‚æžœé‡åˆ°æ²¡æœ‰ã€è¿”å›žä¸»èœå•ã€‘é€‰é¡¹çš„è¯,è¾“å…¥ä¸€ä¸ªé”™è¯¯çš„å€¼å³å¯.
+echo è¯·åªè¿žæŽ¥ä¸€ä¸ªè®¾å¤‡,åŒ…å«æ¨¡æ‹Ÿå™¨!
 echo.
-echo Ñ¡ÔñÒ»¸ö¹¦ÄÜÒÔ¼ÌÐø.
+echo é€‰æ‹©ä¸€ä¸ªåŠŸèƒ½ä»¥ç»§ç»­.
 echo.
-echo ¡¾0¡¿ÎÞÏßÅä¶ÔÉè±¸
+echo ã€0ã€‘æ— çº¿é…å¯¹è®¾å¤‡
 echo.
-echo ¡¾1¡¿¾µÏñ´¦Àí
+echo ã€1ã€‘é•œåƒå¤„ç†
 echo.
-echo ¡¾2¡¿¼àÊÓÆ÷
+echo ã€2ã€‘ç›‘è§†å™¨
 echo.
-echo ¡¾3¡¿Ó¦ÓÃ¹ÜÀí
+echo ã€3ã€‘åº”ç”¨ç®¡ç†
 echo.
-echo ¡¾4¡¿ÔÓÏî¹¦ÄÜ
+echo ã€4ã€‘æ‚é¡¹åŠŸèƒ½
 echo.
-echo ¡¾5¡¿°²×°Çý¶¯
+echo ã€5ã€‘å®‰è£…é©±åŠ¨
 echo.
-echo ¡¾6¡¿ÖØÆô²Ëµ¥
+echo ã€6ã€‘é‡å¯èœå•
 echo.
-echo ¡¾7¡¿´ò¿ª¿ÕÃüÁîÐÐ
+echo ã€7ã€‘æ‰“å¼€ç©ºå‘½ä»¤è¡Œ
 echo.
-echo ¡¾8¡¿ÖØÆôadb·þÎñ
+echo ã€8ã€‘é‡å¯adbæœåŠ¡
 echo.
-echo ¡¾9¡¿¹ØÓÚ
+echo ã€9ã€‘å…³äºŽ
 echo.
 set choice= 
-set /p choice=ÇëÊäÈë¶ÔÓ¦Êý×Ö»Ø³µ£º
+set /p choice=è¯·è¾“å…¥å¯¹åº”æ•°å­—å›žè½¦ï¼š
 if not "%choice%"=="" set choice=%choice:~0,1%
+
 if "%choice%"=="0" goto wireless_connect
 if "%choice%"=="1" start image.bat & %menu%
 if "%choice%"=="2" start monitor.bat & %menu%
 if "%choice%"=="3" start app.bat & %menu%
 if "%choice%"=="4" goto others
-if "%choice%"=="5" start https://www.123pan.com/s/on0rVv-zhhV.html & echo ÒÑ´ò¿ªÍøÒ³£¬Çë×ÔÐÐÏÂÔØ°²×°! & pause >nul & %menu%
+if "%choice%"=="5" start https://www.123pan.com/s/on0rVv-zhhV.html & echo å·²æ‰“å¼€ç½‘é¡µï¼Œè¯·è‡ªè¡Œä¸‹è½½å®‰è£…! & pause >nul & %menu%
 if "%choice%"=="6" goto reboot_menu
 if "%choice%"=="7" (
     cls
-    echo Íê³É
+    echo å®Œæˆ
     cd /d "%~dp0"
     cmd /k
     %MENU%
 )
-if "%choice%"=="8" adb kill-server & adb start-server & echo ÖØÆôÍê±Ï! & %wait% & %menu%
+if "%choice%"=="8" adb kill-server & adb start-server & echo é‡å¯å®Œæ¯•! & %wait% & %menu%
 if "%choice%"=="9" goto about
 %choice_end%
 
@@ -55,80 +56,80 @@ if "%choice%"=="9" goto about
 cls
 setlocal enabledelayedexpansion
 echo.
-echo ÇëÑ¡Ôñ:
+echo è¯·é€‰æ‹©:
 echo.
-echo ¡¾1¡¿Åä¶Ô
+echo ã€1ã€‘é…å¯¹
 echo.
-echo ¡¾2¡¿Á¬½Ó
+echo ã€2ã€‘è¿žæŽ¥
 echo.
 set choice=
-set /p choice=ÇëÊäÈë¶ÔÓ¦Êý×Ö»Ø³µ£º
+set /p choice=è¯·è¾“å…¥å¯¹åº”æ•°å­—å›žè½¦ï¼š
 if not "%choice%"=="" set choice=%choice:~0,1%
 if /i "%choice%"=="1" (
-    set /p ip=ÇëÊäÈëipºÅ¼°¶Ë¿ÚºÅ: 
-    set /p code=ÇëÊäÈëÅä¶ÔÂë:
-    echo ½«»áÒÔ¡¾!code!¡¿ÎªÃÜÔ¿Óë¡¾!ip!¡¿Åä¶Ô, °´ÈÎÒâ¼ü¼ÌÐø.
+    set /p ip=è¯·è¾“å…¥ipå·åŠç«¯å£å·: 
+    set /p code=è¯·è¾“å…¥é…å¯¹ç :
+    echo å°†ä¼šä»¥ã€!code!ã€‘ä¸ºå¯†é’¥ä¸Žã€!ip!ã€‘é…å¯¹, æŒ‰ä»»æ„é”®ç»§ç»­.
     pause >nul
     adb pair !ip! !code! || (
-        echo Åä¶ÔÊ§°Ü
+        echo é…å¯¹å¤±è´¥
         goto wireless_connect
     )
-    echo Åä¶ÔÍê³É.
+    echo é…å¯¹å®Œæˆ.
     pause
     endlocal
 )
 if /i "%choice%"=="2" (
-    set /p ip=ÇëÊäÈëipºÅ¼°¶Ë¿ÚºÅ: 
-    echo ½«»áÓë¡¾!ip!¡¿Á¬½Ó, °´ÈÎÒâ¼ü¼ÌÐø.
+    set /p ip=è¯·è¾“å…¥ipå·åŠç«¯å£å·: 
+    echo å°†ä¼šä¸Žã€!ip!ã€‘è¿žæŽ¥, æŒ‰ä»»æ„é”®ç»§ç»­.
     pause >nul
     adb connect !ip! || (
-        echo Á¬½ÓÊ§°Ü
+        echo è¿žæŽ¥å¤±è´¥
         goto wireless_connect
     )
-    echo Á¬½Ó³É¹¦
+    echo è¿žæŽ¥æˆåŠŸ
     pause
     endlocal
     goto menu
 )
 goto menu
 
-::Ë¢»ú
+::åˆ·æœº
 :sideload
-echo ÇëÏÈ½«Éè±¸ÖÃÓÚRecoveryÄ£Ê½ÖÐ,²¢ÇÒ¿ªÆô¡¾adbÏßË¢/sideload¡¿Ä£Ê½.
-echo ²»Í¬Recovery½Ð·¨¿ÉÄÜ²»Í¬,µ«´ó¶àÔÚ¡¾¸ß¼¶¡¿Ñ¡ÏîÖÐ,²»·ÁÈ¥¿´¿´.
+echo è¯·å…ˆå°†è®¾å¤‡ç½®äºŽRecoveryæ¨¡å¼ä¸­,å¹¶ä¸”å¼€å¯ã€adbçº¿åˆ·/sideloadã€‘æ¨¡å¼.
+echo ä¸åŒRecoveryå«æ³•å¯èƒ½ä¸åŒ,ä½†å¤§å¤šåœ¨ã€é«˜çº§ã€‘é€‰é¡¹ä¸­,ä¸å¦¨åŽ»çœ‹çœ‹.
 call chkdev.bat sideload
-set /p file=ÍÏÈëÒªË¢ÈëµÄÎÄ¼þ²¢»Ø³µ:
-echo °´ÈÎÒâ¼üË¢Èë.
+set /p file=æ‹–å…¥è¦åˆ·å…¥çš„æ–‡ä»¶å¹¶å›žè½¦:
+echo æŒ‰ä»»æ„é”®åˆ·å…¥.
 pause >nul
 adb sideload %file% || %err%
-echo ²Ù×÷³É¹¦Íê³É,½¨Òé¸ñÊ½»¯dataÒÔÈ·±£¸É¾»Ë¢Èë
-echo °´ÈÎÒâ¼ü·µ»ØÖ÷²Ëµ¥.
+echo æ“ä½œæˆåŠŸå®Œæˆ,å»ºè®®æ ¼å¼åŒ–dataä»¥ç¡®ä¿å¹²å‡€åˆ·å…¥
+echo æŒ‰ä»»æ„é”®è¿”å›žä¸»èœå•.
 pause >nul
 %MENU%
 
-::ÔÓÏî¹¦ÄÜ
+::æ‚é¡¹åŠŸèƒ½
 :others
 %partcode%
-echo Ñ¡ÔñÒ»¸ö¹¦ÄÜÒÔ¼ÌÐø.
+echo é€‰æ‹©ä¸€ä¸ªåŠŸèƒ½ä»¥ç»§ç»­.
 echo.
-echo ¡¾1¡¿bootloader½âËø 
+echo ã€1ã€‘bootloaderè§£é” 
 echo.
-echo ¡¾2¡¿É¾³ýÊÖ»úËøÆÁÃÜÂë£¨Ðèroot£© 
+echo ã€2ã€‘åˆ é™¤æ‰‹æœºé”å±å¯†ç ï¼ˆéœ€rootï¼‰ 
 echo.
-echo ¡¾3¡¿´ò¿ªadbshell 
+echo ã€3ã€‘æ‰“å¼€adbshell 
 echo.
-echo ¡¾4¡¿ÍøÂçÑéÖ¤·þÎñÆ÷¸ü¸Ä
+echo ã€4ã€‘ç½‘ç»œéªŒè¯æœåŠ¡å™¨æ›´æ”¹
 echo.
-echo ¡¾5¡¿ÐÞ¸´usb3µ¼ÖÂµÄ¸÷ÖÖÎÊÌâ
+echo ã€5ã€‘ä¿®å¤usb3å¯¼è‡´çš„å„ç§é—®é¢˜
 echo.
 echo.
 set choice=
-set /p choice=ÇëÊäÈë¶ÔÓ¦Êý×Ö»Ø³µ£º
+set /p choice=è¯·è¾“å…¥å¯¹åº”æ•°å­—å›žè½¦ï¼š
 if not "%choice%"=="" set choice=%choice:~0,1%
 if "%choice%"=="1" goto bl_unlock
 if "%choice%"=="2" goto crack
 if "%choice%"=="3" (
-    echo ÕýÔÚ´ò¿ªadbShell...
+    echo æ­£åœ¨æ‰“å¼€adbShell...
     call chkdev.bat system
     adb shell || %err%
 )
@@ -143,26 +144,26 @@ if "%choice%"=="5" (
 call chkdev.bat fastboot
 fastboot getvar all >> %oem_Info%
 if findstr "unlocked:yes" %oem_Info%(
-	echo Éè±¸ÒÑ½âËø£¡°´ÈÎÒâ¼ü·µ»ØÖ÷²Ëµ¥
+	echo è®¾å¤‡å·²è§£é”ï¼æŒ‰ä»»æ„é”®è¿”å›žä¸»èœå•
 	pause >nul
 	%menu%
 )
-echo È·±£ÔÚ²¿·Ö»úÐÍÉÏÒÑ¿ªÆôOEM½âËø¿ª¹Ø.
-set /p key=¼üÈë½âËøÂë(¿ÉÁô¿Õ):
-echo ¿ªÊ¼½âËø...
+echo ç¡®ä¿åœ¨éƒ¨åˆ†æœºåž‹ä¸Šå·²å¼€å¯OEMè§£é”å¼€å…³.
+set /p key=é”®å…¥è§£é”ç (å¯ç•™ç©º):
+echo å¼€å§‹è§£é”...
 if "%key%"==" " fastboot flashing unlock
 fastboot oem unlock %key% || %err%
-echo ²Ù×÷³É¹¦Íê³É!°´ÈÎÒâ¼ü·µ»ØÉÏ¼¶Ö÷²Ëµ¥
+echo æ“ä½œæˆåŠŸå®Œæˆ!æŒ‰ä»»æ„é”®è¿”å›žä¸Šçº§ä¸»èœå•
 pause >nul
 goto others
 
 :crack
-echo ¸Ã³ÌÐòÍ¨¹ýÉ¾³ý/data/system/locksetting.dbÀ´ÊµÏÖ.
-echo °´ÏÂÈÎÒâ¼üÀ´Ö´ÐÐ.
+echo è¯¥ç¨‹åºé€šè¿‡åˆ é™¤/data/system/locksetting.dbæ¥å®žçŽ°.
+echo æŒ‰ä¸‹ä»»æ„é”®æ¥æ‰§è¡Œ.
 pause >nul
 call chkdev.bat system
-adb shell " su -c 'rm /data/system/locksetting.db'" || echo É¾³ýÃÜÂëÊ§°Ü£¡ && %err%
-echo ²Ù×÷³É¹¦Íê³É!°´ÈÎÒâ¼ü·µ»ØÉÏ¼¶²Ëµ¥
+adb shell " su -c 'rm /data/system/locksetting.db'" || echo åˆ é™¤å¯†ç å¤±è´¥ï¼ && %err%
+echo æ“ä½œæˆåŠŸå®Œæˆ!æŒ‰ä»»æ„é”®è¿”å›žä¸Šçº§èœå•
 pause >nul
 goto others
 
@@ -172,18 +173,18 @@ call chkdev.bat system
 adb shell settings put global captive_portal_http_url http://developers.google.cn/generate_204
 adb shell settings put global captive_portal_https_url https://developers.google.cn/generate_204
 adb shell settings put global ntp_server time.asia.apple.com
-echo ¸ü¸ÄÍê³É.°´ÈÎÒâ¼ü·µ»ØÖ÷²Ëµ¥
+echo æ›´æ”¹å®Œæˆ.æŒ‰ä»»æ„é”®è¿”å›žä¸»èœå•
 pause >nul
 %menu%
 
 :about
 cls
-echo adbÏà¹ØÐÅÏ¢---
+echo adbç›¸å…³ä¿¡æ¯---
 adb version
 %partcode%
-echo ±¾³ÌÐò×ñÑ­ AGPL v3 ¿ªÔ´Ð­Òé,ÒÔÏÂÅÅÃû²»·ÖÏÈºó
+echo æœ¬ç¨‹åºéµå¾ª AGPL v3 å¼€æºåè®®,ä»¥ä¸‹æŽ’åä¸åˆ†å…ˆåŽ
 echo.
-echo chkdev.bat À´×ÔBFF ---BY Ä³Ôô---
+echo chkdev.bat æ¥è‡ªBFF ---BY æŸè´¼---
 echo Oringal Link : https://gitee.com/mouzei/bff
 echo.
 echo.payload-dumper-go.exe ---BY ssut---
@@ -199,9 +200,9 @@ echo sdat2img.py
 echo AUTHORS: xpirt - luxi78 - howellzhu
 echo Oringal Link : https://github.com/xpirt/sdat2img
 echo.
-echo AndroidÐ¡¹¤¾ß V2.1.0  ---BY MilkyWeigh--- 
+echo Androidå°å·¥å…· V2.1.0  ---BY MilkyWeigh--- 
 echo.
-echo ¸ÐÐ»ÄãµÄÊ¹ÓÃ!
+echo æ„Ÿè°¢ä½ çš„ä½¿ç”¨!
 pause >nul
 %menu%
 

@@ -11,7 +11,8 @@ set "err=call public.bat err & goto menu"
 set "defalut_over=call public.bat defalut_over & goto menu"
 set partcode=echo **********************************
 set "deltemp=if exist ".\*.txt" (del /f /q .\*.txt)"
-set "choice_end=ECHO. & ECHO. ¡¾ÇëÊäÈëÕýÈ·µÄ×Ö·û,µÈ´ý5Ãë²¢¹ö»ØÖ÷²Ëµ¥¡¿ & ping 127.0.0.1 -n 5 >nul & ECHO. & %MENU% & cls"
+set "choice_end=ECHO. & ECHO. ã€è¯·è¾“å…¥æ­£ç¡®çš„å­—ç¬¦,ç­‰å¾…5ç§’å¹¶æ»šå›žä¸»èœå•ã€‘ & ping 127.0.0.1 -n 5 >nul & ECHO. & %MENU% & cls"
+
 if exist ".\temp" (rmdir /s /q temp)
 if exist ".\output" (rmdir /s /q output)
 mkdir output
@@ -24,14 +25,14 @@ goto :eof
 :err
 color c
 %partcode%
-echo ·¢Éú´íÎó.
-echo ¿ÉÒÔÓÃÉÏ·½µÄ´íÎóÌáÊ¾½áºÏËÑË÷ÒýÇæ²éÕÒ²¢½â¾ö´íÎó.
-echo °´ÈÎÒâ¼ü·µ»ØÖ÷²Ëµ¥.
+echo å‘ç”Ÿé”™è¯¯.
+echo å¯ä»¥ç”¨ä¸Šæ–¹çš„é”™è¯¯æç¤ºç»“åˆæœç´¢å¼•æ“ŽæŸ¥æ‰¾å¹¶è§£å†³é”™è¯¯.
+echo æŒ‰ä»»æ„é”®è¿”å›žä¸»èœå•.
 pause >nul
 goto :eof
 
 :defalut_over
-echo ²Ù×÷³É¹¦Íê³É,°´ÈÎÒâ¼ü·µ»ØÖ÷²Ëµ¥.
+echo æ“ä½œæˆåŠŸå®Œæˆ,æŒ‰ä»»æ„é”®è¿”å›žä¸»èœå•.
 pause >nul
 goto :eof 
 
@@ -58,15 +59,16 @@ goto :eof
 
 :pyinstall
 cls
-echo PythonÎ´°²×°!°´ÈÎÒâ¼ü¿ªÊ¼°²×°.
+echo Pythonæœªå®‰è£…!æŒ‰ä»»æ„é”®å¼€å§‹å®‰è£….
 pause >nul
 PowerShell -executionpolicy bypass -Command "(wget -O C:\Python_setup.exe https://www.python.org/ftp/python/3.12.4/python-3.12.4-amd64.exe) ;cmd /c C:\Python_setup.exe /quiet TargetDir=C:\Program Files\Python InstallAllUsers=1 PrependPath=1 Include_test=0"
 if %errorlevel%==0 (
-        echo °²×°³É¹¦
+        echo å®‰è£…æˆåŠŸ
 ) else (
-    echo °²×°Ê§°Ü£¡Çë¼ì²éÍøÂçÁ¬½Ó²¢È·±£ÏµÍ³ÎÞÒì³£.
+    echo å®‰è£…å¤±è´¥ï¼è¯·æ£€æŸ¥ç½‘ç»œè¿žæŽ¥å¹¶ç¡®ä¿ç³»ç»Ÿæ— å¼‚å¸¸.
 )
 goto :eof
+
 :get_string_length
 @echo off & setlocal enabledelayedexpansion
 set arg1=%~2
@@ -131,18 +133,18 @@ goto :eof
 
 :convert_encode_utf82ANSI
 ::UTF-8 to ANSI
-::UTF-8 ¡ú Unicode
+::UTF-8 â†’ Unicode
 CHCP 65001
-::Èç¹ûÊäÈëµÄ UTF-8 Ã»ÓÐ BOM£¬%~dpn2_unicode-without-BOM.txt ´ò¿ªÂÒÂë
+::å¦‚æžœè¾“å…¥çš„ UTF-8 æ²¡æœ‰ BOMï¼Œ%~dpn2_unicode-without-BOM.txt æ‰“å¼€ä¹±ç 
 CMD /D /U /C  TYPE %~2 > %~dpn2_unicode-without-BOM.txt
-::È¡µÃ Unicode BOM
+::å–å¾— Unicode BOM
 ECHO.//4=>U.bom
 certutil -decode -f U.bom U.bom >NUL
-::Unicode ¡ú Unicode BOM
+::Unicode â†’ Unicode BOM
 CHCP 936 >nul
 MOVE /y  U.bom  %~dpn2_Unicode-BOM.txt >NUL
 TYPE %~dpn2_unicode-without-BOM.txt >> %~dpn2_Unicode-BOM.txt
-::Unicode BOM ¡ú ANSI
+::Unicode BOM â†’ ANSI
 TYPE %~dpn2_Unicode-BOM.txt > %~dpn2_ANSI.txt
 DEL /Q /F %~dpn2_unicode-without-BOM.txt %~dpn2_Unicode-BOM.txt
 goto :eof
