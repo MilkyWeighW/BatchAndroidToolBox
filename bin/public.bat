@@ -11,8 +11,12 @@ set "err=call public.bat err & goto menu"
 set "defalut_over=call public.bat defalut_over & goto menu"
 set partcode=echo **********************************
 set "deltemp=if exist ".\*.txt" (del /f /q .\*.txt)"
-set "choice_end=ECHO. & ECHO. ¡¾ÇëÊäÈëÕýÈ·µÄ×Ö·û,µÈ´ý5Ãë²¢¹ö»ØÖ÷²Ëµ¥¡¿ & ping 127.0.0.1 -n 5 >nul & ECHO. & %MENU% & cls"
-if not exist .\output (mkdir output)
+set "choice_end=ECHO. & ECHO. ã€è¯·è¾“å…¥æ­£ç¡®çš„å­—ç¬¦,ç­‰å¾…5ç§’å¹¶æ»šå›žä¸»èœå•ã€‘ & ping 127.0.0.1 -n 5 >nul & ECHO. & %MENU% & cls"
+
+if exist ".\temp" (rmdir /s /q temp)
+if exist ".\output" (rmdir /s /q output)
+mkdir output
+mkdir temp
 mode con cols=60 lines=30
 cls
 goto :eof
@@ -21,25 +25,26 @@ goto :eof
 :err
 color c
 %partcode%
-echo ·¢Éú´íÎó.
-echo ¿ÉÒÔÓÃÉÏ·½µÄ´íÎóÌáÊ¾½áºÏËÑË÷ÒýÇæ²éÕÒ²¢½â¾ö´íÎó.
-echo °´ÈÎÒâ¼ü·µ»ØÖ÷²Ëµ¥.
+echo å‘ç”Ÿé”™è¯¯.
+echo å¯ä»¥ç”¨ä¸Šæ–¹çš„é”™è¯¯æç¤ºç»“åˆæœç´¢å¼•æ“ŽæŸ¥æ‰¾å¹¶è§£å†³é”™è¯¯.
+echo æŒ‰ä»»æ„é”®è¿”å›žä¸»èœå•.
 pause >nul
 goto :eof
 
 :defalut_over
-echo ²Ù×÷³É¹¦Íê³É,°´ÈÎÒâ¼ü·µ»ØÖ÷²Ëµ¥.
+echo æ“ä½œæˆåŠŸå®Œæˆ,æŒ‰ä»»æ„é”®è¿”å›žä¸»èœå•.
 pause >nul
 goto :eof 
 
 :getfilename
+set filename=
 if not "%file%"=="" for %%i in (%file%) do set filename=%%~ni
 if not "%binpath%"=="" for %%i in (%binpath%) do set filename=%%~ni
 if not "%package%"=="" for %%i in (%package%) do set filename=%%~ni
 setlocal enabledelayedexpansion
 set a=!date:~0,10!
-set filename=!filename!¡¾!a:/=_!¡¤%time::=_%¡¿
-set filename=!filename:.=_!
+set filename=!filename!!a:/=!_%time::=%
+set filename=!filename:.=!
 echo %filename% > filename.txt
 endlocal
 set /p filename=<filename.txt
@@ -54,12 +59,92 @@ goto :eof
 
 :pyinstall
 cls
-echo PythonÎ´°²×°!°´ÈÎÒâ¼ü¿ªÊ¼°²×°.
+echo Pythonæœªå®‰è£…!æŒ‰ä»»æ„é”®å¼€å§‹å®‰è£….
 pause >nul
 PowerShell -executionpolicy bypass -Command "(wget -O C:\Python_setup.exe https://www.python.org/ftp/python/3.12.4/python-3.12.4-amd64.exe) ;cmd /c C:\Python_setup.exe /quiet TargetDir=C:\Program Files\Python InstallAllUsers=1 PrependPath=1 Include_test=0"
 if %errorlevel%==0 (
-        echo °²×°³É¹¦
+        echo å®‰è£…æˆåŠŸ
 ) else (
-    echo °²×°Ê§°Ü£¡Çë¼ì²éÍøÂçÁ¬½Ó²¢È·±£ÏµÍ³ÎÞÒì³£.
+    echo å®‰è£…å¤±è´¥ï¼è¯·æ£€æŸ¥ç½‘ç»œè¿žæŽ¥å¹¶ç¡®ä¿ç³»ç»Ÿæ— å¼‚å¸¸.
 )
+goto :eof
+
+:get_string_length
+@echo off & setlocal enabledelayedexpansion
+set arg1=%~2
+set count=0
+if not defined arg1 goto :eof
+:get_string_length_loop
+if not "!arg1:~%count%,1!" == "" (
+    set /a count+=1
+    goto get_string_length_loop
+)
+echo %count%
+goto :eof
+
+:align
+@echo off
+setlocal enabledelayedexpansion
+set input=%2
+for /f "tokens=1 delims=" %%i in ('dir /b %input%') do (
+    set "input_name=%%i"
+)
+set /a m=line=1&set "act=set/p=,&set/a m=1"
+for %%i in ("%input%") do fsutil file creATenew "%input%.zero" %%~zi >nul
+(for /f "tokens=2" %%a in ('fc /b "%input%" "%input%.zero"^|findstr /irc:"[0-9A-F]*: [0-9A-F][0-9A-F] 00"') do (
+    if /i "%%a"=="0A" (echo,&set/a m=1,line+=1,col=0) else if /i "%%a"=="0D" (echo,
+        for %%l in (!line!) do for /l %%i in (1,1,!col!) do (
+            if !C%%i_%%l! gtr !C%%imax! set/a C%%imax=C%%i_%%l
+            set "C%%i_%%l="
+            ) ) else if /i "%%a"=="20" (%act%) else if /i "%%a"=="09" (%act%) else (
+                    set/p=%%a
+                    set /a col+=m,m=0
+                    set /a C!col!_!line!+=1
+                   )
+        ))<nul >"%input%.temp"
+(for /f "delims=" %%a in (%input%.temp) do (
+    set /a col=0
+    for %%i in (%%a) do (
+        set /a col+=1&set "space="
+        set /a size=C!col!max,len=size*2+2
+        for /l %%i in (1,1,!size!) do set "space=!space!20"
+        set "outstr=%%i!space!"
+        for %%i in (!len!) do echo,!outstr:~0,%%i!
+        )   
+    set /p =0d0a
+)   )<nul >".\temp\out_%input_name%"
+del /q "%input%.zero" "%input%.temp" 
+certutil -decodehex -f ".\temp\out_%input_name%" ".\temp\out_%input_name%" >nul
+goto :eof
+
+:combine_2txts
+set "file1=%2"
+set "file2=%3"
+set "output=%4"
+@echo off
+(for /f "delims=" %%i in ('type %file1%') do (
+    setlocal enabledelayedexpansion
+    set i=%%i
+    set /p str=
+    echo !i! !str!
+    endlocal
+))<%file2% >%output%
+goto :eof
+
+:convert_encode_utf82ANSI
+::UTF-8 to ANSI
+::UTF-8 â†’ Unicode
+CHCP 65001
+::å¦‚æžœè¾“å…¥çš„ UTF-8 æ²¡æœ‰ BOMï¼Œ%~dpn2_unicode-without-BOM.txt æ‰“å¼€ä¹±ç 
+CMD /D /U /C  TYPE %~2 > %~dpn2_unicode-without-BOM.txt
+::å–å¾— Unicode BOM
+ECHO.//4=>U.bom
+certutil -decode -f U.bom U.bom >NUL
+::Unicode â†’ Unicode BOM
+CHCP 936 >nul
+MOVE /y  U.bom  %~dpn2_Unicode-BOM.txt >NUL
+TYPE %~dpn2_unicode-without-BOM.txt >> %~dpn2_Unicode-BOM.txt
+::Unicode BOM â†’ ANSI
+TYPE %~dpn2_Unicode-BOM.txt > %~dpn2_ANSI.txt
+DEL /Q /F %~dpn2_unicode-without-BOM.txt %~dpn2_Unicode-BOM.txt
 goto :eof

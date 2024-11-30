@@ -1,96 +1,134 @@
-::±¾Åú´¦ÀíÎÄ¼şÖ§³ÖÍâ²¿²ÎÊı´«µİ
-::ÓÃ·¨	: call Ó¦ÓÃ¹ÜÀí.bat [MODE] [FILE]
-::
-::ÀıÈç	: call Ó¦ÓÃ¹ÜÀí.bat skipchk 			 ¡¾Ìø¹ıadbÉè±¸Á¬½ÓĞ£Ñé¡¿
-::		: call Ó¦ÓÃ¹ÜÀí.bat uninstall 1.txt	    ¡¾Ğ¶ÔØ1.txtÖĞËùº¬°üÃû¡¿
-::							disable			   ¡¾Ğ¶ÔØ1.txtÖĞËùº¬°üÃû¡¿
-::							enable			   ¡¾Ğ¶ÔØ1.txtÖĞËùº¬°üÃû¡¿
+::æœ¬æ‰¹å¤„ç†æ–‡ä»¶æ”¯æŒå¤–éƒ¨å‚æ•°ä¼ é€’
+
+::ç”¨æ³•	: call app.bat [MODE] [FILE]
+::		: call app.bat uninstall 1.txt	    ã€å¸è½½1.txtä¸­æ‰€å«åŒ…åã€‘
+::					   disable			   ã€å¸è½½1.txtä¸­æ‰€å«åŒ…åã€‘
+::					   enable			   ã€å¸è½½1.txtä¸­æ‰€å«åŒ…åã€‘
 call public.bat head
 
-::½ÓÊÜ²ÎÊı
+::æ¥å—å‚æ•°
 set command=%1
-if "%command%"=="skipchk" ( set skip=1 & goto menu ) 
 if "%command%"=="uninstall" ( set directly_process=1 & set "mode=uninstall" & set file=%2 & goto uninstall_diable_enable_Multiple_excute ) 
 if "%command%"=="disable" ( set directly_process=1 & set "mode=shell pm disable-user" & set file=%2 & goto uninstall_diable_enable_Multiple_excute ) 
 if "%command%"=="enable" ( set directly_process=1 & set "mode=shell enable" & set file=%2 & goto uninstall_diable_enable_Multiple_excute ) 
 
 
-::Ó¦ÓÃ¹ÜÀí²¿·Ö
+::åº”ç”¨ç®¡ç†éƒ¨åˆ†
+
+::å¤„ç†æ–¹å¼é€‰æ‹©
 :menu
 color 3
-if "%skip%"=="0" ( echo ÇëÏÈ½«Éè±¸Á¬½Óadb & call chkdev.bat system & call app.bat skipchk)
-%deltemp%
-cls
-echo ½«»áÕ¹Ê¾Ó¦ÓÃÁĞ±í,Ñ¡ÔñÒ»¸öÑ¡Ïî¼ÌĞø.
-echo.
-echo ¡¾1¡¿Õ¹Ê¾µÚÈı·½Ó¦ÓÃÁĞ±í.
-echo.
-echo ¡¾2¡¿Õ¹Ê¾ÏµÍ³Ó¦ÓÃÁĞ±í.
-echo.
-echo ¡¾3¡¿ÎÒÈ«¶¼Òª!
-echo.
-set choice= 
-set /p choice=ÇëÊäÈë¶ÔÓ¦Êı×Ö»Ø³µ£º
-if not "%choice%"=="" set choice=%choice:~0,1%
-if "%choice%"=="1" set listmode=µÚÈı·½ & adb shell pm list packages -3 > temp.txt & goto output || %err%
-if "%choice%"=="2" set listmode=ÏµÍ³ & adb shell pm list packages -s > temp.txt & goto output || %err%
-if "%choice%"=="3" set listmode=È«²¿ & adb shell pm list packages > temp.txt & goto output|| %err%
-%choice_end%
-
-::´¦ÀíÉú³ÉµÄÎÄ±¾
-:output
-(for /f "usebackq delims=" %%i in ("temp.txt")do (
-	echo %%i>con
-	set h=%%i
-	setlocal enabledelayedexpansion
-	echo !h:~8!
-	endlocal
-))>´¦ÀíºóµÄappÁĞ±í.txt
-del /f /q temp.txt
-cls
-goto app1
-
-::´¦Àí·½Ê½Ñ¡Ôñ
-:app1
-%partcode%
-type ´¦ÀíºóµÄappÁĞ±í.txt
-%partcode%
+title åº”ç”¨ç®¡ç†
 echo. 
-echo ÒÑ´òÓ¡%listmode%Ó¦ÓÃµÄÁĞ±í!ÇëÑ¡ÔñÒ»¸ö²Ù×÷.
-echo ¡¾1¡¿Ğ¶ÔØÓ¦ÓÃ/Çå³ıÊı¾İ 
-echo ¡¾2¡¿Í£ÓÃÓ¦ÓÃ(µ¥¸ö) ¡¾3¡¿Í£ÓÃÓ¦ÓÃ(ÅúÁ¿) 
-echo ¡¾4¡¿ÆôÓÃÓ¦ÓÃ(µ¥¸ö) ¡¾5¡¿ÆôÓÃÓ¦ÓÃ(ÅúÁ¿) 
-echo ¡¾6¡¿ÌáÈ¡µ¥¸öÓ¦ÓÃ°²×°°ü 
-echo ¡¾7¡¿»Øµ½ÉÏÒ»¼¶ 
+echo è¯·é€‰æ‹©ä¸€ä¸ªæ“ä½œ.
+echo.
+echo ã€0ã€‘è¾“å‡ºåº”ç”¨åˆ—è¡¨
+echo.
+echo ã€1ã€‘å¸è½½åº”ç”¨/æ¸…é™¤æ•°æ® 
+echo.
+echo ã€2ã€‘åœç”¨åº”ç”¨(å•ä¸ª) ã€3ã€‘åœç”¨åº”ç”¨(æ‰¹é‡) 
+echo.
+echo ã€4ã€‘å¯ç”¨åº”ç”¨(å•ä¸ª) ã€5ã€‘å¯ç”¨åº”ç”¨(æ‰¹é‡) 
+echo.
+echo ã€6ã€‘æå–å•ä¸ªåº”ç”¨å®‰è£…åŒ… 
+echo.
+echo ã€7ã€‘å®‰è£…åº”ç”¨(å•ä¸ª) ã€8ã€‘å®‰è£…åº”ç”¨(æ‰¹é‡)
+echo.
 set choice=
 set mode=
-set /p choice=ÇëÊäÈë¶ÔÓ¦Êı×Ö»Ø³µ£º
+set /p choice=è¯·è¾“å…¥å¯¹åº”æ•°å­—å›è½¦ï¼š
 if not "%choice%"=="" set choice=%choice:~0,1%
+if "%choice%"=="0" goto applist_output
 if "%choice%"=="1" goto uninstall_clear_app
 if "%choice%"=="2" set "mode=shell pm disable-user" & goto disable_enable_app_Single
 if "%choice%"=="3" set "mode=shell pm disable-user" & goto uninstall_diable_enable_Multiple
 if "%choice%"=="4" set "mode=shell enable" & goto disable_enable_app_Single
 if "%choice%"=="5" set "mode=shell enable" & goto uninstall_diable_enable_Multiple
 if "%choice%"=="6" goto apkout
-if "%choice%"=="7" %menu%
+if "%choice%"=="7" goto installapp_single
+if "%choice%"=="8" goto installapp_batch
 %choice_end%
 
-::Ğ¶ÔØµ¥¸öÓ¦ÓÃ
+:installapp_batch
+set /p path=æ‹–å…¥å«æœ‰apkæ–‡ä»¶çš„æ–‡ä»¶å¤¹:
+%partcode%
+echo æ‰€æœ‰æ–‡ä»¶å¦‚ä¸‹:
+dir %path% /b > apks.txt
+type apks.txt
+%partcode%
+echo å°†ä¼šå®‰è£…è¿™äº›æ–‡ä»¶ï¼ŒæŒ‰ä»»æ„é”®ç»§ç»­
+pause
+for /f "tokens=1 delims=. " %%i in (apks.txt) do (
+    setlocal enabledelayedexpansion
+    %partcode%
+    echo æ­£åœ¨å®‰è£…%%i...
+    set "file=%path%\%%i.apk"
+    adb install !file!
+    endlocal
+)
+echo å®‰è£…å®Œæˆ,æŒ‰ä»»æ„é”®è¿”å›ä¸»ç¨‹åº
+pause >nul
+%menu%
+
+:installapp_single
+echo.
+set file=
+set /p file=æ‹–å…¥apkå®‰è£…åŒ…,ç„¶åå›è½¦.
+echo å¼€å§‹å®‰è£…...
+adb install %file% || %err%
+echo å®Œæˆ!æŒ‰ä»»æ„é”®ç»§ç»­å®‰è£…,è¾“å…¥ã€bã€‘è¿”å›.
+set choice= 
+set /p choice=ç»§ç»­å®‰è£…å°±å›è½¦å§ï¼š
+if not "%choice%"=="" set choice=%choice:~0,1%
+if "%choice%"=="b" cls & %MENU%
+echo.
+goto installapp
+
+:applist_output
+title åº”ç”¨ç®¡ç†
+echo.
+echo é€‰æ‹©ä¸€ä¸ªé€‰é¡¹ç»§ç»­.
+echo.
+echo ã€1ã€‘å±•ç¤ºç¬¬ä¸‰æ–¹åº”ç”¨åˆ—è¡¨.
+echo ã€2ã€‘å±•ç¤ºç³»ç»Ÿåº”ç”¨åˆ—è¡¨.
+echo ã€3ã€‘æˆ‘å…¨éƒ½è¦!
+echo.
+set choice= 
+set /p choice=è¯·è¾“å…¥å¯¹åº”æ•°å­—å›è½¦ï¼š
+if not "%choice%"=="" set choice=%choice:~0,1%
+if "%choice%"=="1" (
+    call monitor applist_output -3 
+    start cmd /k type %~dp0output\app_processed.txt 
+    goto menu
+)
+if "%choice%"=="2" (
+    call monitor applist_output -s 
+    start cmd /k type %~dp0output\app_processed.txt 
+    goto menu
+)
+if "%choice%"=="3" (
+    call monitor applist_output
+    start cmd /k type %~dp0output\app_processed.txt 
+    goto menu
+)
+
+
+::å¸è½½å•ä¸ªåº”ç”¨
 :uninstall_clear_app
 echo.
 %partcode%
-echo Ñ¡ÔñÒ»¸ö²Ù×÷:
+echo é€‰æ‹©ä¸€ä¸ªæ“ä½œ:
 echo.
-echo ¡¾1¡¿Ğ¶ÔØÒ»¸öÓ¦ÓÃ±¾Éí¼°»º´æ.
+echo ã€1ã€‘å¸è½½ä¸€ä¸ªåº”ç”¨æœ¬èº«åŠç¼“å­˜.
 echo.
-echo ¡¾2¡¿Ğ¶ÔØÒ»¸öÓ¦ÓÃ£¬µ«±£ÁôÊı¾İºÍ»º´æÎÄ¼ş.
+echo ã€2ã€‘å¸è½½ä¸€ä¸ªåº”ç”¨ï¼Œä½†ä¿ç•™æ•°æ®å’Œç¼“å­˜æ–‡ä»¶.
 echo.
-echo ¡¾3¡¿ÅúÁ¿Ğ¶ÔØ
+echo ã€3ã€‘æ‰¹é‡å¸è½½
 echo.
-echo ¡¾4¡¿ÇåÀíÒ»¸öÓ¦ÓÃµÄÊı¾İ
+echo ã€4ã€‘æ¸…ç†ä¸€ä¸ªåº”ç”¨çš„æ•°æ®
 echo.
 set choice= 
-set /p choice=ÇëÊäÈë¶ÔÓ¦Êı×Ö»Ø³µ£º
+set /p choice=è¯·è¾“å…¥å¯¹åº”æ•°å­—å›è½¦ï¼š
 if not "%choice%"=="" set choice=%choice:~0,1%
 if "%choice%"=="1" set mode=  & goto uninstall_clear_app_execute
 if "%choice%"=="2" set mode=-k & goto uninstall_clear_app_execute
@@ -99,48 +137,48 @@ if "%choice%"=="4" goto clearapp
 %choice_end%
 
 :uninstall_clear_app_execute
-if "%mode%"=="" set mode_name=ÍêÈ«Ğ¶ÔØ
-if "%mode%"=="-k" set mode_name=Ğ¶ÔØ£¬µ«±£Áô±£ÁôÊı¾İºÍ»º´æÎÄ¼ş
-echo ÄãÑ¡ÔñÁË: %mode_name%
-set /p pkgname=ÊäÈëÒ»¸ö·ÇÏµÍ³Ó¦ÓÃµÄ°üÃûºó»Ø³µ :
-echo ¿ªÊ¼Ğ¶ÔØ%pkgname%µÄÈ«²¿...
+if "%mode%"=="" set mode_name=å®Œå…¨å¸è½½
+if "%mode%"=="-k" set mode_name=å¸è½½ï¼Œä½†ä¿ç•™ä¿ç•™æ•°æ®å’Œç¼“å­˜æ–‡ä»¶
+echo ä½ é€‰æ‹©äº†: %mode_name%
+set /p pkgname=è¾“å…¥ä¸€ä¸ªéç³»ç»Ÿåº”ç”¨çš„åŒ…ååå›è½¦ :
+echo å¼€å§‹å¸è½½%pkgname%çš„å…¨éƒ¨...
 adb uninstall %mode% %pkgname% || %err%
 goto fini_uninst
 
 :clearapp
-set /p pkgname=ÊäÈëÒ»¸ö·ÇÏµÍ³Ó¦ÓÃµÄ°üÃûºó»Ø³µ:
-echo ¿ªÊ¼ÇåÀí%pkgname%µÄÊı¾İ...
+set /p pkgname=è¾“å…¥ä¸€ä¸ªéç³»ç»Ÿåº”ç”¨çš„åŒ…ååå›è½¦:
+echo å¼€å§‹æ¸…ç†%pkgname%çš„æ•°æ®...
 adb clear %pkgname% || %err%
 goto fini_uninst
 
-::µ¥¸öÓ¦ÓÃµÄÆôÍ£
+::å•ä¸ªåº”ç”¨çš„å¯åœ
 :disable_enable_app_Single
-if "%mode%"=="shell pm disable-user" set mode_name=Í£ÓÃ
-if "%mode%"=="shell enable" set mode_name=ÆôÓÃ
-echo ÄãÑ¡ÔñÁË£»%mode_name% µ¥¸öÓ¦ÓÃ
-set /p pkgname=ÊäÈëÒ»¸öÓ¦ÓÃµÄ°üÃûºó»Ø³µ:
-echo °´ÈÎÒâ¼ü¼ÌĞø.
+if "%mode%"=="shell pm disable-user" set mode_name=åœç”¨
+if "%mode%"=="shell enable" set mode_name=å¯ç”¨
+echo ä½ é€‰æ‹©äº†ï¼›%mode_name% å•ä¸ªåº”ç”¨
+set /p pkgname=è¾“å…¥ä¸€ä¸ªåº”ç”¨çš„åŒ…ååå›è½¦:
+echo æŒ‰ä»»æ„é”®ç»§ç»­.
 pause >nul
 adb %mode% %pkgname% || %err%
-echo ²Ù×÷³É¹¦Íê³É!°´ÈÎÒâ¼ü·µ»ØÉÏ¼¶²Ëµ¥.
+echo æ“ä½œæˆåŠŸå®Œæˆ!æŒ‰ä»»æ„é”®è¿”å›ä¸Šçº§èœå•.
 pause >nul
-goto app1
+goto menu
 
-::¶àĞĞ´¦Àí²¿·Ö
+::å¤šè¡Œå¤„ç†éƒ¨åˆ†
 :uninstall_diable_enable_Multiple
-if "%mode%"=="uninstall" set mode_name=Ğ¶ÔØ
-if "%mode%"=="shell pm disable-user" set mode_name=Í£ÓÃ
-if "%mode%"=="shell enable" set mode_name=ÆôÓÃ
-echo ÍÏÈë´¦Àí¹ıµÄtxtÎÄ¼ş£¬ÎÄÖĞĞèÒªº¬ÓĞ°üÃû,Ò»ÅÅÒ»¸ö°üÃû.²»ÄÜ%mode_name%ÏµÍ³Ó¦ÓÃ
-echo Ê¾Àı:
-echo example.txt--------ÏÂÃæµ½ºáÏßµÄµØ·½¶¼ÊÇtxtÎÄ¼şÄÚÈİ--------------
+if "%mode%"=="uninstall" set mode_name=å¸è½½
+if "%mode%"=="shell pm disable-user" set mode_name=åœç”¨
+if "%mode%"=="shell enable" set mode_name=å¯ç”¨
+echo æ‹–å…¥å¤„ç†è¿‡çš„txtæ–‡ä»¶ï¼Œæ–‡ä¸­éœ€è¦å«æœ‰åŒ…å,ä¸€æ’ä¸€ä¸ªåŒ…å.ä¸èƒ½%mode_name%ç³»ç»Ÿåº”ç”¨
+echo ç¤ºä¾‹:
+echo example.txt--------ä¸‹é¢åˆ°æ¨ªçº¿çš„åœ°æ–¹éƒ½æ˜¯txtæ–‡ä»¶å†…å®¹--------------
 echo.
 echo com.baoming.baoming
 echo.
-echo ---ÕâÑùÔÚÍÏÈëÎÄ¼şºó,³ÌĞò½«»á%mode_name%"com.baoming.baoming"Õâ¸öÓ¦ÓÃ--
-echo ÌáÊ¾:µ±Äã´òÓ¡ÍêÓ¦ÓÃÁĞ±íµÄÄÇÒ»¿Ì,¿´¿´³ÌĞòµÄbinÄ¿Â¼,¶àÁËÁ½¸ötxtÎÄ¼ş,Ñ¡Ôñ´¦ÀíºóµÄ¾Í¿ÉÒÔ.
-echo Äú¿ÉÒÔ½«³ÌĞò¹Ø±Õºó½«ÁĞ±íÖĞÄú²»ĞèÒªµÄÓ¦ÓÃµÄ°üÃûÉ¾È¥,ÒÔÃâ´íÎó´¦ÀíÖØÒªÓ¦ÓÃ.
-set /p file=ÍÏÈë´¦Àí¹ıµÄtxtÎÄ¼ş:
+echo ---è¿™æ ·åœ¨æ‹–å…¥æ–‡ä»¶å,ç¨‹åºå°†ä¼š%mode_name%"com.baoming.baoming"è¿™ä¸ªåº”ç”¨--
+echo æç¤º:å½“ä½ æ‰“å°å®Œåº”ç”¨åˆ—è¡¨çš„é‚£ä¸€åˆ»,çœ‹çœ‹ç¨‹åºçš„binç›®å½•,å¤šäº†ä¸¤ä¸ªtxtæ–‡ä»¶,é€‰æ‹©å¤„ç†åçš„å°±å¯ä»¥.
+echo æ‚¨å¯ä»¥å°†ç¨‹åºå…³é—­åå°†åˆ—è¡¨ä¸­æ‚¨ä¸éœ€è¦çš„åº”ç”¨çš„åŒ…ååˆ å»,ä»¥å…é”™è¯¯å¤„ç†é‡è¦åº”ç”¨.
+set /p file=æ‹–å…¥å¤„ç†è¿‡çš„txtæ–‡ä»¶:
 goto uninstall_diable_enable_Multiple_excute
 
 :uninstall_diable_enable_Multiple_excute
@@ -154,21 +192,25 @@ if "%directly_process%"=="1" %defalut_over%
 goto fini_uninst_disable_enable
 
 :fini_uninst_disable_enable
-echo Íê³É%mode_name%,°´ÈÎÒâ¼ü·µ»ØÉÏÉÏ¼¶²Ëµ¥.
+echo å®Œæˆ%mode_name%,æŒ‰ä»»æ„é”®è¿”å›ä¸Šä¸Šçº§èœå•.
 pause >nul
-goto app1
+goto menu
 
-::ÌáÈ¡Ó¦ÓÃ°²×°°ü
+::æå–åº”ç”¨å®‰è£…åŒ…
 :apkout
 setlocal enabledelayedexpansion
-set /p app_pkgname=¼üÈëÏëÒªÌáÈ¡Ó¦ÓÃµÄ°üÃû:
+set /p app_pkgname=é”®å…¥æƒ³è¦æå–åº”ç”¨çš„åŒ…å:
 for /f "delims=" %%i in ('adb shell pm path %app_pkgname%') do set path_package=%%i 
 set path_package=!path_package:~8!
-adb pull %path_package% %~dp0output\%app_pkgname%.apk
-echo ÒÑÌáÈ¡¡¾%app_pkgname%¡¿µÄ°²×°°üÖÁ±¾³ÌĞòoutputÄ¿Â¼ÏÂ.
+echo.
+echo æ­£åœ¨æå–ï¼Œè¯·ç¨ç­‰...
+adb pull %path_package% %~dp0output\%app_pkgname%.apk >nul
+echo.
+echo å·²æå–ã€%app_pkgname%ã€‘çš„å®‰è£…åŒ…è‡³
+echo %~dp0outputç›®å½•ä¸‹. & start %~dp0output 
 endlocal
 pause
 cls
-goto app1
+goto menu
 
 
